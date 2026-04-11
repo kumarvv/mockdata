@@ -10,11 +10,12 @@ tables:
     columns:
       - id: sql|<sql statement returning a value>
       - uuid: uuid
+      - username: random_string|10
       - first_name: random_first_name|male
       - last_name: random_last_name|male
       - gender: random_gender
       - email: random_email
-      - description: random_string|<min-length>[,<max-length>]
+      - description: random_string|5,100
       - address: random_address|US
       - street: random_street|US
       - city: random_city|US
