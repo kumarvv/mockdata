@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"kumarvv.com/mockdata/core"
+	"kumarvv.com/mockdata/configs"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 	}
 
 	configFile := os.Args[1]
-	config, err := core.LoadConfig(configFile)
+	config, err := configs.LoadConfig(configFile)
 	if err != nil {
 		fmt.Print(err)
 		return
