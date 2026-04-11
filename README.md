@@ -1,2 +1,2 @@
-# mock-data
+# mockdata
 Mock Data Generator
