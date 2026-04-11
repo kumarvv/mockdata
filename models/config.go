@@ -19,15 +19,15 @@ type Config struct {
 }
 
 type ConfigTarget struct {
-	Type       string `json:"type" yaml:"type"`
-	DbConnStr  string `json:"db_conn_str" yaml:"db_conn_str"`
-	DbUsername string `json:"db_username" yaml:"db_username"`
-	DbPassword string `json:"db_password" yaml:"db_password"`
+	Type      string `json:"type" yaml:"type"`
+	DbType    string `json:"db_type" yaml:"db_type"`
+	DbConnStr string `json:"db_conn_str" yaml:"db_conn_str"`
+	ToPath    string `json:"to_path" yaml:"to_path"`
 }
 
 // ConfigTable defines the structure of Table specific overrides
 type ConfigTable struct {
 	Name    string              `json:"name" yaml:"name"`
-	Method  string              `json:"method" yaml:"method"`
+	Mode    string              `json:"mode" yaml:"mode"`
 	Columns []map[string]string `json:"columns" yaml:"columns"`
 }

@@ -1,0 +1,25 @@
+target:
+  type: db|sql|json
+  db_type: mysql|postgres|sqlite
+  db_conn_str: db://...
+  to_path: <path>
+
+tables:
+  - name: <table_name>
+    mode: append|merge
+    columns:
+      - id: sql|<sql statment returning a value>
+      - uuid: uuid
+      - name: random_name
+      - description: random_string|<length>[|<length-max>]
+      - source: <string|number|boolean>|this is valid string
+      - address: random_address|<country>
+      - street: random_street
+      - city: random_city|<country>
+      - state: random_state|<country>
+      - country: random_country
+      - user_type: random_in|admin,normal,viewer
+      - department_id: random_from|departments,id
+      - tags: random_multiple
+      - is_active: boolean|true
+      - created_at: random_date

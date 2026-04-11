@@ -1,24 +1,29 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"kumarvv.com/mockdata/configs"
+	"kumarvv.com/mockdata/utils"
 )
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("ERROR: Config file argument is required")
+		utils.LogErrM("ERROR: Config file argument is required")
 		return
 	}
 
+	utils.Log("loading config file %s ...", os.Args[1])
 	configFile := os.Args[1]
-	config, err := configs.LoadConfig(configFile)
-	if err != nil {
-		fmt.Print(err)
+	config, errs := configs.Load(configFile)
+	if errs != nil {
+		for _, err := range errs {
+			utils.LogErr(err)
+		}
 		return
 	}
+	utils.Log("config file loaded successfully")
 
+	utils.Log("DONE")
 	print(config)
 }
