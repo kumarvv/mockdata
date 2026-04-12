@@ -31,9 +31,9 @@ func generateValue(ctx context.Context, valueExpr string) (interface{}, error) {
 	} else if valueType == valuetypes.Boolean {
 		return utils.ToBool(firstValue), nil
 	} else if valueType == valuetypes.Date {
-		return utils.ToTime(firstValue), nil
+		return utils.ToTime(firstValue)
 	} else if valueType == valuetypes.DateTime {
-		return utils.ToTime(firstValue), nil
+		return utils.ToTime(firstValue)
 	} else if valueType == valuetypes.UUID {
 		return uuid.New().String(), nil
 	} else if valueType == valuetypes.RandomString {
