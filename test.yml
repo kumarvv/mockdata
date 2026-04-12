@@ -1,0 +1,13 @@
+target:
+  type: json
+  to_path: /Users/kumarvv/dev/temp
+
+tables:
+  - name: tags
+    mode: append
+    row_count: 10
+    columns:
+      - uuid: uuid
+      - name: random_name
+      - description: random_paragraph
+      - is_active: boolean|true
