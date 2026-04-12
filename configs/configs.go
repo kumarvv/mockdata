@@ -139,10 +139,17 @@ func Validate(config *models.Config) []error {
 					if !utils.Includes(valuetypes.List(), valueType) {
 						errs = append(errs, errors.Errorf("invalid value type %s for table.column %s.%s",
 							table.Name, column, valueType))
-					} else if valuetypes.IsRequiredValueExpr(valueType) && utils.IsBlank(valueExpr) {
-						errs = append(errs, errors.Errorf("value expression is required for table.column %s.%s",
-							table.Name, column))
+					} else {
+						if valuetypes.IsRequiredValueExpr(valueType) && utils.IsBlank(valueExpr) {
+							errs = append(errs, errors.Errorf("value expression is required for table.column %s.%s",
+								table.Name, column))
+						}
+						if config.Target.Type != targettypes.SQL && valuetypes.IsDbRequired(valueType) {
+							errs = append(errs, errors.Errorf("target type should be DB for table.column %s.%s and valueType=%s",
+								table.Name, column, valueType))
+						}
 					}
+
 					break
 				}
 			}

@@ -92,3 +92,10 @@ func IsRequiredValueExpr(valueType string) bool {
 		RandomFrom,
 	}, valueType)
 }
+
+func IsDbRequired(valueType string) bool {
+	return utils.Includes([]string{
+		SQL,
+		RandomFrom,
+	}, valueType)
+}

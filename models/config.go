@@ -27,7 +27,8 @@ type ConfigTarget struct {
 
 // ConfigTable defines the structure of Table specific overrides
 type ConfigTable struct {
-	Name    string              `json:"name" yaml:"name"`
-	Mode    string              `json:"mode" yaml:"mode"`
-	Columns []map[string]string `json:"columns" yaml:"columns"`
+	Name     string              `json:"name" yaml:"name"`
+	Mode     string              `json:"mode" yaml:"mode"`
+	RowCount int                 `json:"row_count" yaml:"row_count"`
+	Columns  []map[string]string `json:"columns" yaml:"columns"`
 }
