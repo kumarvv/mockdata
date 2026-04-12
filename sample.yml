@@ -1,14 +1,11 @@
 target:
-  type: sql
-  db_type: mysql|postgres|sqlite
-  db_conn_str: db://...
-  to_path: <path>
+  type: json
+  to_path: /Users/kumarvv/dev/temp
 
 tables:
   - name: users
     mode: append
     columns:
-      - id: sql|<sql statement returning a value>
       - uuid: uuid
       - username: random_string|10
       - first_name: random_first_name|male
@@ -22,7 +19,6 @@ tables:
       - state: random_state|US
       - country: random_country2
       - user_type: random_in|admin,normal,viewer
-      - department_id: random_from|departments,id
       - source: string|generated
       - is_active: boolean|true
       - created_at: random_date
