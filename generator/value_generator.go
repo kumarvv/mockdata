@@ -77,13 +77,21 @@ func generateValue(ctx context.Context, valueExpr string) (interface{}, error) {
 	} else if valueType == valuetypes.RandomParagraph {
 		return randomdata.Paragraph(), nil
 	} else if valueType == valuetypes.RandomFormat {
+		return randomdata.StringNumber(3, "-"), nil
 	} else if valueType == valuetypes.RandomDate {
+		return randomdata.FullDate(), nil
 	} else if valueType == valuetypes.RandomDay {
+		return randomdata.Day(), nil
 	} else if valueType == valuetypes.RandomMonth {
+		return randomdata.Month(), nil
 	} else if valueType == valuetypes.RandomYear {
+		return randomdata.Number(1900, 2999), nil
 	} else if valueType == valuetypes.RandomPhone {
+		return randomdata.PhoneNumber(), nil
 	} else if valueType == valuetypes.RandomIn {
+		return randomdata.StringSample("a", "b"), nil
 	} else if valueType == valuetypes.RandomFrom {
+		// TODO sql
 	}
 
 	return nil, nil
