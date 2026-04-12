@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	orderedmap "github.com/wk8/go-ordered-map"
 	"kumarvv.com/mockdata/models"
 	"kumarvv.com/mockdata/utils"
 )
@@ -30,15 +29,15 @@ func generateJSON(ctx context.Context, config *models.Config) error {
 
 		utils.Log("generating rows: %d", table.RowCount)
 		logMarker := 0
-		rows := make([]*orderedmap.OrderedMap, 0)
+		rows := make([]map[string]interface{}, 0)
 		for r := 0; r < table.RowCount; r++ {
-			row := orderedmap.New[string, interface{}]()
+			row := make(map[string]interface{})
 			for _, col := range table.Columns {
 				for column, valueExpr := range col {
 					if value, err := generateValue(ctx, valueExpr); err != nil {
 						return errors.Wrapf(err, "failed to generate value for table(%d of %d): name=%s, column=%s", i+1, len(config.Tables), table.Name, column)
 					} else {
-						row.Set(column, value)
+						row[column] = value
 					}
 				}
 			}
@@ -53,6 +52,8 @@ func generateJSON(ctx context.Context, config *models.Config) error {
 		// write file
 		utils.Log("creating json file at path=%s", tablePath)
 		if b, err := json.MarshalIndent(rows, "", "  "); err != nil {
+			return errors.Wrapf(err, "failed to marshal json file: %s", tablePath)
+		} else {
 			if err = os.WriteFile(tablePath, b, os.ModePerm); err != nil {
 				return errors.Wrapf(err, "failed to write file: %s", tablePath)
 			}
