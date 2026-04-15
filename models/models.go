@@ -40,4 +40,5 @@ type ConfigColumn struct {
 	Min    *int        `json:"min" yaml:"min"`
 	Max    *int        `json:"max" yaml:"max"`
 	Format *string     `json:"format" yaml:"format"`
+	Case   *string     `json:"case" yaml:"case"`
 }
