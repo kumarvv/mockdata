@@ -5,7 +5,8 @@ import "kumarvv.com/mockdata/utils"
 const (
 	SQL             = "sql"
 	String          = "string"
-	Number          = "number"
+	Integer         = "integer"
+	Float           = "float"
 	Boolean         = "boolean"
 	Date            = "date"
 	DateTime        = "datetime"
@@ -15,7 +16,7 @@ const (
 	RandomGender    = "random_gender"
 	RandomFirstName = "random_first_name"
 	RandomLastName  = "random_last_name"
-	RandomName      = "random_name"
+	RandomFullName  = "random_full_name"
 	RandomEmail     = "random_email"
 	RandomCurrency  = "random_currency"
 	RandomAddress   = "random_address"
@@ -44,7 +45,8 @@ func List() []string {
 	return []string{
 		SQL,
 		String,
-		Number,
+		Integer,
+		Float,
 		Boolean,
 		Date,
 		DateTime,
@@ -54,7 +56,7 @@ func List() []string {
 		RandomGender,
 		RandomFirstName,
 		RandomLastName,
-		RandomName,
+		RandomFullName,
 		RandomEmail,
 		RandomCurrency,
 		RandomAddress,
@@ -84,7 +86,8 @@ func IsRequiredValueExpr(valueType string) bool {
 	return utils.Includes([]string{
 		SQL,
 		String,
-		Number,
+		Integer,
+		Float,
 		Boolean,
 		Date,
 		DateTime,
