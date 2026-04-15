@@ -8,7 +8,10 @@ import (
 	"time"
 )
 
-const typeTime = "time.Time"
+const (
+	typeTime      = "time.Time"
+	DateFormatYMD = "2006-01-02"
+)
 
 // ToString converts interface{} to string
 func ToString(v interface{}) (s string) {
@@ -90,9 +93,9 @@ func ToBool(v interface{}) (b bool) {
 	return
 }
 
-// ToTime converts interface{} to time
+// ToTimeFormat converts interface{} to time
 // expects time.Type or String type with RFC3339 format
-func ToTime(v interface{}) (t time.Time, err error) {
+func ToTimeFormat(v interface{}, format string) (t time.Time, err error) {
 	if v == nil {
 		return
 	}
@@ -100,14 +103,13 @@ func ToTime(v interface{}) (t time.Time, err error) {
 	if reflect.TypeOf(v).String() == typeTime {
 		t = v.(time.Time)
 	} else if reflect.TypeOf(v).Kind() == reflect.String {
-		t, err = time.Parse(time.RFC3339, v.(string))
-		//if err != nil {
-		//	// try converting with mm/dd/yyyy
-		//	t, err = time.Parse(timeutil.DateFormatMDY, v.(string))
-		//}
+		t, err = time.Parse(format, v.(string))
 		return
 	}
 	return
+}
+func ToTime(v interface{}) (t time.Time, err error) {
+	return ToTimeFormat(v, DateFormatYMD)
 }
 
 // ToFloat converts interface{} to float64
