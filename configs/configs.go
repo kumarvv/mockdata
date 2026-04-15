@@ -35,7 +35,7 @@ func Load(path string) (*models.Config, []error) {
 	}
 
 	var config models.Config
-	err = yaml.Unmarshal(data, &config)
+	err = yaml.UnmarshalStrict(data, &config)
 	if err != nil {
 		err = errors.Wrapf(err, "failed to unmarshal file %s", path)
 		return nil, []error{err}
