@@ -32,15 +32,13 @@ func generateJSON(ctx context.Context, config *models.Config) error {
 		rows := make([]map[string]interface{}, 0)
 		for r := 0; r < table.RowCount; r++ {
 			row := make(map[string]interface{})
-			for _, col := range table.Columns {
-				for column, valueExpr := range col {
-					if value, err := generateValue(ctx, valueExpr); err != nil {
-						return errors.Wrapf(err, "failed to generate value for table(%d of %d): name=%s, column=%s", i+1, len(config.Tables), table.Name, column)
-					} else {
-						row[column] = value
-					}
-				}
-			}
+			//for _, column := range table.Columns {
+			//	//if value, err := generateValue(ctx, column.Value); err != nil {
+			//	//	return errors.Wrapf(err, "failed to generate value for table(%d of %d): name=%s, column=%s", i+1, len(config.Tables), table.Name, column)
+			//	//} else {
+			//	//	row[column] = value
+			//	//}
+			//}
 			rows = append(rows, row)
 			logMarker++
 			if logMarker%100 == 0 {
