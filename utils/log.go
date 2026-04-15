@@ -7,7 +7,7 @@ func Log(msg string, args ...interface{}) {
 }
 
 func LogErr(err error) {
-	fmt.Printf("ERROR: " + err.Error() + "\n")
+	fmt.Printf("ERROR: %s\n", err.Error())
 }
 
 func LogErrM(msg string, args ...interface{}) {
