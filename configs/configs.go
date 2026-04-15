@@ -128,29 +128,19 @@ func Validate(config *models.Config) []error {
 		if len(table.Columns) == 0 {
 			errs = append(errs, errors.Errorf("at least one column is required for table %s", table.Name))
 		} else {
-			for _, colMap := range table.Columns {
-				for column, value := range colMap {
-					tokens := strings.Split(value, "|")
-					valueType := tokens[0]
-					valueExpr := ""
-					if len(tokens) > 1 {
-						valueExpr = tokens[1]
+			for _, column := range table.Columns {
+				if !utils.Includes(valuetypes.List(), column.Type) {
+					errs = append(errs, errors.Errorf("invalid value type %s for table.column %s.%s",
+						table.Name, column.Name, column.Type))
+				} else {
+					if valuetypes.IsRequiredValueExpr(column.Type) && column.Value == nil {
+						errs = append(errs, errors.Errorf("value is required for table.column %s.%s",
+							table.Name, column.Name))
 					}
-					if !utils.Includes(valuetypes.List(), valueType) {
-						errs = append(errs, errors.Errorf("invalid value type %s for table.column %s.%s",
-							table.Name, column, valueType))
-					} else {
-						if valuetypes.IsRequiredValueExpr(valueType) && utils.IsBlank(valueExpr) {
-							errs = append(errs, errors.Errorf("value expression is required for table.column %s.%s",
-								table.Name, column))
-						}
-						if config.Target.Type != targettypes.SQL && valuetypes.IsDbRequired(valueType) {
-							errs = append(errs, errors.Errorf("target type should be DB for table.column %s.%s and valueType=%s",
-								table.Name, column, valueType))
-						}
+					if config.Target.Type != targettypes.SQL && valuetypes.IsDbRequired(column.Type) {
+						errs = append(errs, errors.Errorf("target type should be DB for table.column %s.%s and valueType=%s",
+							table.Name, column.Name, column.Type))
 					}
-
-					break
 				}
 			}
 		}
