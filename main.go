@@ -11,7 +11,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		utils.LogErrM("ERROR: Config file argument is required")
+		utils.LogErrM("Config file argument is required")
 		return
 	}
 
