@@ -7,40 +7,34 @@ import (
 	"github.com/Pallinder/go-randomdata"
 	"github.com/google/uuid"
 	"kumarvv.com/mockdata/constants/valuetypes"
+	"kumarvv.com/mockdata/models"
 	"kumarvv.com/mockdata/utils"
 )
 
-func generateValue(ctx context.Context, valueExpr string) (interface{}, error) {
-	tokens := strings.Split(valueExpr, "|")
-	valueType := tokens[0]
-	valueParams := ""
-	if len(tokens) > 1 {
-		valueParams = tokens[1]
-	}
-	firstValue := valueParams
-
+func generateValue(ctx context.Context, column *models.ConfigColumn) (interface{}, error) {
+	valueType := column.Type
 	gender := 0
 
 	if valueType == valuetypes.SQL {
 		// TODO
 	} else if valueType == valuetypes.String {
-		return firstValue, nil
+		return column.Value, nil
 	} else if valueType == valuetypes.Integer {
-		return utils.ToInt(firstValue), nil
+		return utils.ToInt(column.Value), nil
 	} else if valueType == valuetypes.Float {
-		return utils.ToInt(firstValue), nil
+		return utils.ToFloat(column.Value), nil
 	} else if valueType == valuetypes.Boolean {
-		return utils.ToBool(firstValue), nil
+		return utils.ToBool(column.Value), nil
 	} else if valueType == valuetypes.Date {
-		return utils.ToTime(firstValue)
+		return utils.ToTime(column.Value)
 	} else if valueType == valuetypes.DateTime {
-		return utils.ToTime(firstValue)
+		return utils.ToTime(column.Value)
 	} else if valueType == valuetypes.UUID {
 		return uuid.New().String(), nil
 	} else if valueType == valuetypes.RandomString {
-		return randomdata.SillyName(), nil
+		return withCase(ctx, column, withLen(ctx, column, randomdata.SillyName())), nil
 	} else if valueType == valuetypes.RandomTitle {
-		return randomdata.Title(gender), nil
+		return withCase(ctx, column, withLen(ctx, column, randomdata.Title(gender))), nil
 	} else if valueType == valuetypes.RandomGender {
 		return randomdata.SillyName(), nil
 	} else if valueType == valuetypes.RandomFirstName {
@@ -98,10 +92,33 @@ func generateValue(ctx context.Context, valueExpr string) (interface{}, error) {
 	return nil, nil
 }
 
-func getValueParams1(valueExpr string) []string {
-	tokens := strings.Split(valueExpr, "|")
-	if len(tokens) > 1 {
-		return strings.Split(tokens[1], ",")
+func withCase(ctx context.Context, column *models.ConfigColumn, value string) string {
+	if column.Case == nil {
+		return value
 	}
-	return nil
+	if *column.Case == "lower" {
+		return strings.ToLower(value)
+	} else if *column.Case == "upper" {
+		return strings.ToUpper(value)
+	} else {
+		return value
+	}
+}
+
+func withLen(ctx context.Context, column *models.ConfigColumn, value string) string {
+	if column.Max == nil && column.Min == nil {
+		return value
+	}
+
+	lValue := value
+	if column.Min != nil && len(value) < *column.Min {
+		for len(lValue) < *column.Min {
+			lValue = value + randomdata.SillyName()
+		}
+	}
+	if len(lValue) > *column.Max {
+		return lValue[:*column.Max]
+	}
+
+	return lValue
 }
