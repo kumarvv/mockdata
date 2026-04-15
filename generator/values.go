@@ -13,12 +13,11 @@ import (
 func generateValue(ctx context.Context, valueExpr string) (interface{}, error) {
 	tokens := strings.Split(valueExpr, "|")
 	valueType := tokens[0]
-	valueParams := make([]string, 0)
-	firstValue := ""
+	valueParams := ""
 	if len(tokens) > 1 {
-		valueParams = strings.Split(tokens[1], ",")
-		firstValue = valueParams[0]
+		valueParams = tokens[1]
 	}
+	firstValue := valueParams
 
 	gender := 0
 
@@ -26,7 +25,9 @@ func generateValue(ctx context.Context, valueExpr string) (interface{}, error) {
 		// TODO
 	} else if valueType == valuetypes.String {
 		return firstValue, nil
-	} else if valueType == valuetypes.Number {
+	} else if valueType == valuetypes.Integer {
+		return utils.ToInt(firstValue), nil
+	} else if valueType == valuetypes.Float {
 		return utils.ToInt(firstValue), nil
 	} else if valueType == valuetypes.Boolean {
 		return utils.ToBool(firstValue), nil
@@ -46,7 +47,7 @@ func generateValue(ctx context.Context, valueExpr string) (interface{}, error) {
 		return randomdata.FirstName(gender), nil
 	} else if valueType == valuetypes.RandomLastName {
 		return randomdata.LastName(), nil
-	} else if valueType == valuetypes.RandomName {
+	} else if valueType == valuetypes.RandomFullName {
 		return randomdata.FullName(gender), nil
 	} else if valueType == valuetypes.RandomEmail {
 		return randomdata.Email(), nil
@@ -95,4 +96,12 @@ func generateValue(ctx context.Context, valueExpr string) (interface{}, error) {
 	}
 
 	return nil, nil
+}
+
+func getValueParams1(valueExpr string) []string {
+	tokens := strings.Split(valueExpr, "|")
+	if len(tokens) > 1 {
+		return strings.Split(tokens[1], ",")
+	}
+	return nil
 }
