@@ -32,5 +32,4 @@ func main() {
 	}
 
 	utils.Log("DONE")
-	print(config)
 }
