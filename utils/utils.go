@@ -1,6 +1,9 @@
 package utils
 
-import "strings"
+import (
+	"math/rand"
+	"strings"
+)
 
 func IsBlank(s string) bool {
 	return strings.TrimSpace(s) == ""
@@ -17,4 +20,10 @@ func Includes(arr []string, str string) bool {
 		}
 	}
 	return false
+}
+
+func RandomOneOf[T any](values ...T) T {
+	l := len(values)
+	i := rand.Intn(l)
+	return values[i]
 }
