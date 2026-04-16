@@ -7,7 +7,7 @@ tables:
     mode: append
     row_count: 10
     columns:
-      - name: uuid
+      - key: uuid
         type: uuid
       - name: name
         type: random_full_name
