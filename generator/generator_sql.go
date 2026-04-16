@@ -28,7 +28,9 @@ func generateSQL(ctx context.Context, table *models.ConfigTable, rows []map[stri
 		for _, columnName := range columnNames {
 			value := row[columnName]
 			valueStr := ""
-			if reflect.TypeOf(value).Kind() == reflect.String {
+			if value == nil {
+				value = "NULL"
+			} else if reflect.TypeOf(value).Kind() == reflect.String {
 				valueStr = fmt.Sprintf("'%s'", value)
 			} else {
 				valueStr = fmt.Sprintf("%v", value)
