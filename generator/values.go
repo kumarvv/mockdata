@@ -35,7 +35,7 @@ func (v *valueGen) Value() (interface{}, error) {
 	}
 }
 
-func generateValue(ctx context.Context, column *models.ConfigColumn, gender int) (interface{}, error) {
+func generateValue(ctx context.Context, column *models.ConfigColumn, gender, ix int) (interface{}, error) {
 	valueType := column.Type
 	value := column.Value
 	var err error
@@ -61,6 +61,12 @@ func generateValue(ctx context.Context, column *models.ConfigColumn, gender int)
 		} else {
 			value, err = utils.ToTime(column.Value)
 		}
+	} else if valueType == valuetypes.Serial {
+		minValue := 1
+		if column.Min != nil {
+			minValue = *column.Min
+		}
+		value = minValue + ix
 	} else if valueType == valuetypes.UUID {
 		value = uuid.New().String()
 	} else if valueType == valuetypes.RandomString {
@@ -160,7 +166,7 @@ func generateValue(ctx context.Context, column *models.ConfigColumn, gender int)
 		valueStr := utils.ToString(column.Value)
 		tokens := utils.SplitToFloat(valueStr, ",")
 		value = utils.RandomOneOf(tokens...)
-	} else if valueType == valuetypes.RandomFrom {
+	} else if valueType == valuetypes.RandomFromSQL {
 		// TODO sql
 	}
 
