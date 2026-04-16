@@ -10,6 +10,7 @@ const (
 	Boolean         = "boolean"
 	Date            = "date"
 	DateTime        = "datetime"
+	Serial          = "serial"
 	UUID            = "uuid"
 	RandomString    = "random_string"
 	RandomTitle     = "random_title"
@@ -40,7 +41,8 @@ const (
 	RandomInString  = "random_in_string"
 	RandomInInteger = "random_in_integer"
 	RandomInFloat   = "random_in_float"
-	RandomFrom      = "random_from"
+	RandomRange     = "random_range"
+	RandomFromSQL   = "random_from_sql"
 )
 
 func List() []string {
@@ -52,6 +54,7 @@ func List() []string {
 		Boolean,
 		Date,
 		DateTime,
+		Serial,
 		UUID,
 		RandomString,
 		RandomTitle,
@@ -82,7 +85,8 @@ func List() []string {
 		RandomInString,
 		RandomInInteger,
 		RandomInFloat,
-		RandomFrom,
+		RandomRange,
+		RandomFromSQL,
 	}
 }
 
@@ -98,14 +102,14 @@ func IsRequiredValueExpr(valueType string) bool {
 		RandomInString,
 		RandomInInteger,
 		RandomInFloat,
-		RandomFrom,
+		RandomFromSQL,
 	}, valueType)
 }
 
 func IsDbRequired(valueType string) bool {
 	return utils.Includes([]string{
 		SQL,
-		RandomFrom,
+		RandomFromSQL,
 	}, valueType)
 }
 
