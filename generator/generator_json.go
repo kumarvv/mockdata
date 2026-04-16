@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Pallinder/go-randomdata"
 	"github.com/pkg/errors"
 	"kumarvv.com/mockdata/models"
 	"kumarvv.com/mockdata/utils"
@@ -30,10 +31,11 @@ func generateJSON(ctx context.Context, config *models.Config) error {
 		utils.Log("generating rows: %d", table.RowCount)
 		logMarker := 0
 		rows := make([]map[string]interface{}, 0)
+		gender := utils.RandomOneOf(randomdata.Male, randomdata.Female)
 		for r := 0; r < table.RowCount; r++ {
 			row := make(map[string]interface{})
 			for _, column := range table.Columns {
-				if value, err := generateValue(ctx, &column); err != nil {
+				if value, err := generateValue(ctx, &column, gender); err != nil {
 					return errors.Wrapf(err, "failed to generate value for table(%d of %d): name=%s, column=%s", i+1,
 						len(config.Tables), table.Name, column.Name)
 				} else {

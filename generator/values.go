@@ -35,10 +35,8 @@ func (v *valueGen) Value() (interface{}, error) {
 	}
 }
 
-func generateValue(ctx context.Context, column *models.ConfigColumn) (interface{}, error) {
+func generateValue(ctx context.Context, column *models.ConfigColumn, gender int) (interface{}, error) {
 	valueType := column.Type
-	gender := utils.RandomOneOf(randomdata.Male, randomdata.Female)
-
 	value := column.Value
 	var err error
 	if valueType == valuetypes.SQL {
