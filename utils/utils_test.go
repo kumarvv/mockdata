@@ -1,14 +1,349 @@
 package utils
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
+
+// ---- IsBlank ----
+
+func TestIsBlank(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  bool
+	}{
+		{"empty string", "", true},
+		{"spaces only", "   ", true},
+		{"tabs and spaces", "\t  \t", true},
+		{"newline only", "\n", true},
+		{"non-blank", "hello", false},
+		{"spaces around text", "  hello  ", false},
+		{"single char", "a", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsBlank(tt.input); got != tt.want {
+				t.Errorf("IsBlank(%q) = %v, want %v", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+// ---- Includes ----
+
+func TestIncludes(t *testing.T) {
+	tests := []struct {
+		name string
+		arr  []string
+		str  string
+		want bool
+	}{
+		{"found in middle", []string{"a", "b", "c"}, "b", true},
+		{"found at start", []string{"a", "b", "c"}, "a", true},
+		{"found at end", []string{"a", "b", "c"}, "c", true},
+		{"not found", []string{"a", "b", "c"}, "d", false},
+		{"empty array", []string{}, "a", false},
+		{"nil array", nil, "a", false},
+		{"empty string match", []string{"", "a"}, "", true},
+		{"case sensitive", []string{"Hello"}, "hello", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Includes(tt.arr, tt.str); got != tt.want {
+				t.Errorf("Includes(%v, %q) = %v, want %v", tt.arr, tt.str, got, tt.want)
+			}
+		})
+	}
+}
+
+// ---- RandomOneOf ----
 
 func TestRandomOneOf(t *testing.T) {
-	v := RandomOneOf(1, 2, 3, 4, 5, 6)
-	println(v)
+	t.Run("int - result is one of input values", func(t *testing.T) {
+		values := []int{10, 20, 30, 40, 50}
+		for i := 0; i < 50; i++ {
+			got := RandomOneOf(values...)
+			if !func() bool {
+				for _, v := range values {
+					if v == got {
+						return true
+					}
+				}
+				return false
+			}() {
+				t.Errorf("RandomOneOf returned %v which is not in input", got)
+			}
+		}
+	})
 
-	arr := []string{"Vijay", "Sabi", "Shru", "Anan", "Priya", "Rob", "Abc"}
-	for i := 0; i < 10; i++ {
-		s := RandomOneOf(arr...)
-		println(s)
+	t.Run("string - result is one of input values", func(t *testing.T) {
+		values := []string{"foo", "bar", "baz"}
+		for i := 0; i < 50; i++ {
+			got := RandomOneOf(values...)
+			if !Includes(values, got) {
+				t.Errorf("RandomOneOf returned %q which is not in input", got)
+			}
+		}
+	})
+
+	t.Run("single value always returns that value", func(t *testing.T) {
+		for i := 0; i < 10; i++ {
+			if got := RandomOneOf("only"); got != "only" {
+				t.Errorf("expected 'only', got %q", got)
+			}
+		}
+	})
+
+	t.Run("all values eventually returned", func(t *testing.T) {
+		seen := map[int]bool{}
+		for i := 0; i < 1000; i++ {
+			seen[RandomOneOf(1, 2, 3)] = true
+		}
+		for _, v := range []int{1, 2, 3} {
+			if !seen[v] {
+				t.Errorf("value %d was never returned in 1000 iterations", v)
+			}
+		}
+	})
+}
+
+// ---- SplitToInt ----
+
+func TestSplitToInt(t *testing.T) {
+	tests := []struct {
+		name string
+		s    string
+		sep  string
+		want []int64
+	}{
+		{"comma separated", "1,2,3", ",", []int64{1, 2, 3}},
+		{"pipe separated", "10|20|30", "|", []int64{10, 20, 30}},
+		{"single value", "42", ",", []int64{42}},
+		{"negative values", "-1,-2,-3", ",", []int64{-1, -2, -3}},
+		{"invalid entries become zero", "1,abc,3", ",", []int64{1, 0, 3}},
+		{"empty string yields zero", "", ",", []int64{0}},
+		{"spaces not trimmed", "1, 2, 3", ",", []int64{1, 0, 0}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := SplitToInt(tt.s, tt.sep)
+			if len(got) != len(tt.want) {
+				t.Fatalf("SplitToInt(%q, %q) len = %d, want %d", tt.s, tt.sep, len(got), len(tt.want))
+			}
+			for i := range got {
+				if got[i] != tt.want[i] {
+					t.Errorf("SplitToInt(%q, %q)[%d] = %d, want %d", tt.s, tt.sep, i, got[i], tt.want[i])
+				}
+			}
+		})
+	}
+}
+
+// ---- SplitToFloat ----
+
+func TestSplitToFloat(t *testing.T) {
+	tests := []struct {
+		name string
+		s    string
+		sep  string
+		want []float64
+	}{
+		{"comma separated", "1.1,2.2,3.3", ",", []float64{1.1, 2.2, 3.3}},
+		{"pipe separated", "1.5|2.5", "|", []float64{1.5, 2.5}},
+		{"integer strings", "1,2,3", ",", []float64{1.0, 2.0, 3.0}},
+		{"single value", "3.14", ",", []float64{3.14}},
+		{"invalid entries become zero", "1.1,abc,3.3", ",", []float64{1.1, 0, 3.3}},
+		{"empty string yields zero", "", ",", []float64{0}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := SplitToFloat(tt.s, tt.sep)
+			if len(got) != len(tt.want) {
+				t.Fatalf("SplitToFloat(%q, %q) len = %d, want %d", tt.s, tt.sep, len(got), len(tt.want))
+			}
+			for i := range got {
+				if got[i] != tt.want[i] {
+					t.Errorf("SplitToFloat(%q, %q)[%d] = %v, want %v", tt.s, tt.sep, i, got[i], tt.want[i])
+				}
+			}
+		})
+	}
+}
+
+// ---- ToString ----
+
+func TestToString(t *testing.T) {
+	ts := time.Date(2024, 6, 15, 10, 30, 0, 0, time.UTC)
+	tests := []struct {
+		name  string
+		input interface{}
+		want  string
+	}{
+		{"nil", nil, ""},
+		{"string", "hello", "hello"},
+		{"int", 42, "42"},
+		{"int64", int64(100), "100"},
+		{"float64", 3.14, "3.14"},
+		{"bool true", true, "true"},
+		{"bool false", false, "false"},
+		{"time.Time", ts, ts.Format(time.RFC3339)},
+		{"empty string", "", ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ToString(tt.input); got != tt.want {
+				t.Errorf("ToString(%v) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+// ---- ToInt ----
+
+func TestToInt(t *testing.T) {
+	tests := []struct {
+		name  string
+		input interface{}
+		want  int64
+	}{
+		{"nil", nil, 0},
+		{"string valid", "42", 42},
+		{"string zero", "0", 0},
+		{"string negative", "-10", -10},
+		{"string invalid", "abc", 0},
+		{"int", int(7), 7},
+		{"int8", int8(8), 8},
+		{"int16", int16(16), 16},
+		{"int32", int32(32), 32},
+		{"int64", int64(64), 64},
+		{"uint", uint(5), 5},
+		{"uint8", uint8(8), 8},
+		{"uint16", uint16(16), 16},
+		{"uint32", uint32(32), 32},
+		{"uint64", uint64(64), 64},
+		{"float64", float64(3.9), 3},
+		{"float32", float32(2.7), 2},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ToInt(tt.input); got != tt.want {
+				t.Errorf("ToInt(%v) = %d, want %d", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+// ---- ToBool ----
+
+func TestToBool(t *testing.T) {
+	tests := []struct {
+		name  string
+		input interface{}
+		want  bool
+	}{
+		{"nil", nil, false},
+		{"bool true", true, true},
+		{"bool false", false, false},
+		{"string true", "true", true},
+		{"string TRUE uppercase", "TRUE", true},
+		{"string True mixed", "True", true},
+		{"string y", "y", true},
+		{"string yes", "yes", true},
+		{"string YES", "YES", true},
+		{"string false", "false", false},
+		{"string no", "no", false},
+		{"string 1", "1", false},
+		{"string empty", "", false},
+		{"int 1", 1, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ToBool(tt.input); got != tt.want {
+				t.Errorf("ToBool(%v) = %v, want %v", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+// ---- ToFloat ----
+
+func TestToFloat(t *testing.T) {
+	tests := []struct {
+		name  string
+		input interface{}
+		want  float64
+	}{
+		{"nil", nil, 0},
+		{"string valid", "3.14", 3.14},
+		{"string integer", "10", 10.0},
+		{"string invalid", "abc", 0},
+		{"string empty", "", 0},
+		{"float64", float64(2.71), 2.71},
+		{"float32", float32(1.5), float64(float32(1.5))},
+		{"int (unsupported kind)", 42, 0},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ToFloat(tt.input); got != tt.want {
+				t.Errorf("ToFloat(%v) = %v, want %v", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+// ---- ToTime / ToTimeFormat ----
+
+func TestToTime(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   interface{}
+		want    time.Time
+		wantErr bool
+	}{
+		{"nil", nil, time.Time{}, false},
+		{"valid date string", "2024-06-15", time.Date(2024, 6, 15, 0, 0, 0, 0, time.UTC), false},
+		{"invalid date string", "not-a-date", time.Time{}, true},
+		{"time.Time passthrough", time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC), time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC), false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ToTime(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ToTime(%v) error = %v, wantErr %v", tt.input, err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && !got.Equal(tt.want) {
+				t.Errorf("ToTime(%v) = %v, want %v", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestToTimeFormat(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   interface{}
+		format  string
+		want    time.Time
+		wantErr bool
+	}{
+		{"nil", nil, time.RFC3339, time.Time{}, false},
+		{"RFC3339 string", "2024-06-15T10:30:00Z", time.RFC3339, time.Date(2024, 6, 15, 10, 30, 0, 0, time.UTC), false},
+		{"custom format", "15/06/2024", "02/01/2006", time.Date(2024, 6, 15, 0, 0, 0, 0, time.UTC), false},
+		{"invalid string", "bad", time.RFC3339, time.Time{}, true},
+		{"time.Time passthrough", time.Date(2023, 3, 10, 0, 0, 0, 0, time.UTC), DateFormatYMD, time.Date(2023, 3, 10, 0, 0, 0, 0, time.UTC), false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ToTimeFormat(tt.input, tt.format)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ToTimeFormat(%v, %q) error = %v, wantErr %v", tt.input, tt.format, err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && !got.Equal(tt.want) {
+				t.Errorf("ToTimeFormat(%v, %q) = %v, want %v", tt.input, tt.format, got, tt.want)
+			}
+		})
 	}
 }
