@@ -37,7 +37,9 @@ const (
 	RandomMonth     = "random_month"
 	RandomYear      = "random_year"
 	RandomPhone     = "random_phone"
-	RandomIn        = "random_in"
+	RandomInString  = "random_in_string"
+	RandomInInteger = "random_in_integer"
+	RandomInFloat   = "random_in_float"
 	RandomFrom      = "random_from"
 )
 
@@ -77,7 +79,9 @@ func List() []string {
 		RandomMonth,
 		RandomYear,
 		RandomPhone,
-		RandomIn,
+		RandomInString,
+		RandomInInteger,
+		RandomInFloat,
 		RandomFrom,
 	}
 }
@@ -91,7 +95,9 @@ func IsRequiredValueExpr(valueType string) bool {
 		Boolean,
 		Date,
 		DateTime,
-		RandomIn,
+		RandomInString,
+		RandomInInteger,
+		RandomInFloat,
 		RandomFrom,
 	}, valueType)
 }
@@ -100,5 +106,31 @@ func IsDbRequired(valueType string) bool {
 	return utils.Includes([]string{
 		SQL,
 		RandomFrom,
+	}, valueType)
+}
+
+func IsString(valueType string) bool {
+	return utils.Includes([]string{
+		String,
+		RandomString,
+		RandomTitle,
+		RandomGender,
+		RandomFirstName,
+		RandomLastName,
+		RandomFullName,
+		RandomEmail,
+		RandomCurrency,
+		RandomAddress,
+		RandomStreet,
+		RandomCity,
+		RandomState,
+		RandomState2,
+		RandomCountry,
+		RandomCountry2,
+		RandomCountry3,
+		RandomParagraph,
+		RandomFormat,
+		RandomPhone,
+		RandomInString,
 	}, valueType)
 }
