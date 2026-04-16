@@ -11,88 +11,165 @@ import (
 	"kumarvv.com/mockdata/utils"
 )
 
+type valueGen struct {
+	column *models.ConfigColumn
+	value  interface{}
+	err    error
+}
+
+func getValue(column *models.ConfigColumn, value interface{}) *valueGen {
+	return &valueGen{
+		column: column,
+		value:  value,
+		err:    nil,
+	}
+}
+func (v *valueGen) Value() (interface{}, error) {
+	if valuetypes.IsString(v.column.Type) {
+		valueStr := utils.ToString(v.value)
+		valueStr = withLen(v.column, valueStr)
+		valueStr = withCase(v.column, valueStr)
+		return valueStr, v.err
+	} else {
+		return v.value, v.err
+	}
+}
+
 func generateValue(ctx context.Context, column *models.ConfigColumn) (interface{}, error) {
 	valueType := column.Type
-	gender := 0
+	gender := utils.RandomOneOf(randomdata.Male, randomdata.Female)
 
+	value := column.Value
+	var err error
 	if valueType == valuetypes.SQL {
 		// TODO
 	} else if valueType == valuetypes.String {
-		return column.Value, nil
+		value, err = getValue(column, utils.ToString(column.Value)).Value()
 	} else if valueType == valuetypes.Integer {
-		return utils.ToInt(column.Value), nil
+		value, err = getValue(column, utils.ToInt(column.Value)).Value()
 	} else if valueType == valuetypes.Float {
-		return utils.ToFloat(column.Value), nil
+		value, err = getValue(column, utils.ToFloat(column.Value)).Value()
 	} else if valueType == valuetypes.Boolean {
-		return utils.ToBool(column.Value), nil
+		value, err = getValue(column, utils.ToBool(column.Value)).Value()
 	} else if valueType == valuetypes.Date {
-		return utils.ToTime(column.Value)
+		if column.Format != nil {
+			value, err = utils.ToTimeFormat(column.Value, *column.Format)
+		} else {
+			value, err = utils.ToTime(column.Value)
+		}
 	} else if valueType == valuetypes.DateTime {
-		return utils.ToTime(column.Value)
+		if column.Format != nil {
+			value, err = utils.ToTimeFormat(column.Value, *column.Format)
+		} else {
+			value, err = utils.ToTime(column.Value)
+		}
 	} else if valueType == valuetypes.UUID {
-		return uuid.New().String(), nil
+		value = uuid.New().String()
 	} else if valueType == valuetypes.RandomString {
-		return withCase(ctx, column, withLen(ctx, column, randomdata.SillyName())), nil
+		value, err = getValue(column, randomdata.SillyName()).Value()
 	} else if valueType == valuetypes.RandomTitle {
-		return withCase(ctx, column, withLen(ctx, column, randomdata.Title(gender))), nil
+		value, err = getValue(column, randomdata.Title(gender)).Value()
 	} else if valueType == valuetypes.RandomGender {
-		return randomdata.SillyName(), nil
+		valueStr := "male"
+		if gender == randomdata.Female {
+			valueStr = "female"
+		}
+		value, err = getValue(column, valueStr).Value()
 	} else if valueType == valuetypes.RandomFirstName {
-		return randomdata.FirstName(gender), nil
+		value, err = getValue(column, randomdata.FirstName(gender)).Value()
 	} else if valueType == valuetypes.RandomLastName {
-		return randomdata.LastName(), nil
+		value, err = getValue(column, randomdata.LastName()).Value()
 	} else if valueType == valuetypes.RandomFullName {
-		return randomdata.FullName(gender), nil
+		value, err = getValue(column, randomdata.FullName(gender)).Value()
 	} else if valueType == valuetypes.RandomEmail {
-		return randomdata.Email(), nil
+		value, err = getValue(column, randomdata.Email()).Value()
 	} else if valueType == valuetypes.RandomCurrency {
-		return randomdata.Currency(), nil
+		value, err = getValue(column, randomdata.Currency()).Value()
 	} else if valueType == valuetypes.RandomAddress {
-		return randomdata.Address(), nil
+		value, err = getValue(column, randomdata.Address()).Value()
 	} else if valueType == valuetypes.RandomStreet {
-		return randomdata.Street(), nil
+		value, err = getValue(column, randomdata.Street()).Value()
 	} else if valueType == valuetypes.RandomCity {
-		return randomdata.City(), nil
+		value, err = getValue(column, randomdata.City()).Value()
 	} else if valueType == valuetypes.RandomState {
-		return randomdata.State(randomdata.Large), nil
+		value, err = getValue(column, randomdata.State(randomdata.Large)).Value()
 	} else if valueType == valuetypes.RandomState2 {
-		return randomdata.State(randomdata.Small), nil
+		value, err = getValue(column, randomdata.State(randomdata.Small)).Value()
 	} else if valueType == valuetypes.RandomCountry {
-		return randomdata.Country(randomdata.FullCountry), nil
+		value, err = getValue(column, randomdata.Country(randomdata.FullCountry)).Value()
 	} else if valueType == valuetypes.RandomCountry2 {
-		return randomdata.Country(randomdata.TwoCharCountry), nil
+		value, err = getValue(column, randomdata.Country(randomdata.TwoCharCountry)).Value()
 	} else if valueType == valuetypes.RandomCountry3 {
-		return randomdata.Country(randomdata.ThreeCharCountry), nil
+		value, err = getValue(column, randomdata.Country(randomdata.ThreeCharCountry)).Value()
 	} else if valueType == valuetypes.RandomNumber {
-		return randomdata.Number(), nil
+		if column.Min != nil && column.Max != nil {
+			value, err = getValue(column, randomdata.Number(*column.Min, *column.Max)).Value()
+		} else if column.Min != nil {
+			value, err = getValue(column, randomdata.Number(*column.Min)).Value()
+		} else if column.Max != nil {
+			value, err = getValue(column, randomdata.Number(0, *column.Max)).Value()
+		} else {
+			value, err = getValue(column, randomdata.Number()).Value()
+		}
 	} else if valueType == valuetypes.RandomDecimal {
-		return randomdata.Decimal(), nil
+		if column.Min != nil && column.Max != nil {
+			value, err = getValue(column, randomdata.Decimal(*column.Min, *column.Max)).Value()
+		} else if column.Min != nil {
+			value, err = getValue(column, randomdata.Decimal(*column.Min)).Value()
+		} else if column.Max != nil {
+			value, err = getValue(column, randomdata.Decimal(0, *column.Max)).Value()
+		} else {
+			value, err = getValue(column, randomdata.Decimal()).Value()
+		}
 	} else if valueType == valuetypes.RandomBoolean {
-		return randomdata.Boolean(), nil
+		value, err = getValue(column, randomdata.Boolean()).Value()
 	} else if valueType == valuetypes.RandomParagraph {
-		return randomdata.Paragraph(), nil
+		value, err = getValue(column, randomdata.Paragraph()).Value()
 	} else if valueType == valuetypes.RandomFormat {
-		return randomdata.StringNumber(3, "-"), nil
+		value, err = getValue(column, randomdata.Boolean()).Value()
+		if column.NumPairs != nil && column.Separator != nil {
+			return randomdata.StringNumber(*column.NumPairs, *column.Separator), nil
+		} else {
+			randomdata.StringNumber(1, "")
+		}
 	} else if valueType == valuetypes.RandomDate {
-		return randomdata.FullDate(), nil
+		dtStr := randomdata.FullDate()
+		dt, err := utils.ToTimeFormat(dtStr, randomdata.DateOutputLayout)
+		if err == nil {
+			if column.Format != nil {
+				value = dt.Format(*column.Format)
+			} else {
+				value = dt.Format(utils.DateFormatYMD)
+			}
+		}
 	} else if valueType == valuetypes.RandomDay {
-		return randomdata.Day(), nil
+		value = randomdata.Day()
 	} else if valueType == valuetypes.RandomMonth {
-		return randomdata.Month(), nil
+		value = randomdata.Month()
 	} else if valueType == valuetypes.RandomYear {
-		return randomdata.Number(1900, 2999), nil
+		value = randomdata.Number(1900, 2999)
 	} else if valueType == valuetypes.RandomPhone {
-		return randomdata.PhoneNumber(), nil
-	} else if valueType == valuetypes.RandomIn {
-		return randomdata.StringSample("a", "b"), nil
+		value = randomdata.PhoneNumber()
+	} else if valueType == valuetypes.RandomInString {
+		valueStr := utils.ToString(column.Value)
+		tokens := strings.Split(valueStr, ",")
+		value = utils.RandomOneOf(tokens...)
+	} else if valueType == valuetypes.RandomInInteger {
+		valueStr := utils.ToString(column.Value)
+		tokens := utils.SplitToInt(valueStr, ",")
+		value = utils.RandomOneOf(tokens...)
+	} else if valueType == valuetypes.RandomInFloat {
+		valueStr := utils.ToString(column.Value)
+		tokens := utils.SplitToFloat(valueStr, ",")
+		value = utils.RandomOneOf(tokens...)
 	} else if valueType == valuetypes.RandomFrom {
 		// TODO sql
 	}
 
-	return nil, nil
+	return value, err
 }
 
-func withCase(ctx context.Context, column *models.ConfigColumn, value string) string {
+func withCase(column *models.ConfigColumn, value string) string {
 	if column.Case == nil {
 		return value
 	}
@@ -105,7 +182,7 @@ func withCase(ctx context.Context, column *models.ConfigColumn, value string) st
 	}
 }
 
-func withLen(ctx context.Context, column *models.ConfigColumn, value string) string {
+func withLen(column *models.ConfigColumn, value string) string {
 	if column.Max == nil && column.Min == nil {
 		return value
 	}
