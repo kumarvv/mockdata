@@ -27,3 +27,21 @@ func RandomOneOf[T any](values ...T) T {
 	i := rand.Intn(l)
 	return values[i]
 }
+
+func SplitToInt(s, sep string) []int64 {
+	items := strings.Split(s, sep)
+	values := make([]int64, 0)
+	for _, item := range items {
+		values = append(values, ToInt(item))
+	}
+	return values
+}
+
+func SplitToFloat(s, sep string) []float64 {
+	items := strings.Split(s, sep)
+	values := make([]float64, 0)
+	for _, item := range items {
+		values = append(values, ToFloat(item))
+	}
+	return values
+}
