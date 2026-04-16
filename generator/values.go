@@ -35,7 +35,7 @@ func (v *valueGen) Value() (interface{}, error) {
 	}
 }
 
-func generateValue(ctx context.Context, column *models.ConfigColumn, gender, ix int) (interface{}, error) {
+func generateValue(ctx context.Context, table *models.ConfigTable, column *models.ConfigColumn, gender, ix int) (interface{}, error) {
 	valueType := column.Type
 	value := column.Value
 	var err error
@@ -166,6 +166,16 @@ func generateValue(ctx context.Context, column *models.ConfigColumn, gender, ix 
 		valueStr := utils.ToString(column.Value)
 		tokens := utils.SplitToFloat(valueStr, ",")
 		value = utils.RandomOneOf(tokens...)
+	} else if valueType == valuetypes.RandomRange {
+		if column.Min != nil && column.Max != nil {
+			value = randomdata.Number(*column.Min, *column.Max)
+		} else if column.Min != nil {
+			value = randomdata.Number(*column.Min, *column.Min+table.RowCount)
+		} else if column.Max != nil {
+			value = randomdata.Number(1, *column.Max)
+		} else {
+			value = randomdata.Number()
+		}
 	} else if valueType == valuetypes.RandomFromSQL {
 		// TODO sql
 	}
@@ -197,7 +207,7 @@ func withLen(column *models.ConfigColumn, value string) string {
 			lValue = value + randomdata.SillyName()
 		}
 	}
-	if len(lValue) > *column.Max {
+	if column.Max != nil && len(lValue) > *column.Max {
 		return lValue[:*column.Max]
 	}
 
