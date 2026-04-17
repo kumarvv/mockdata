@@ -7,9 +7,9 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 	"kumarvv.com/mockdata/constants/dbtypes"
+	"kumarvv.com/mockdata/constants/functiontypes"
 	"kumarvv.com/mockdata/constants/tablemodes"
 	"kumarvv.com/mockdata/constants/targettypes"
-	"kumarvv.com/mockdata/constants/valuetypes"
 	"kumarvv.com/mockdata/utils"
 
 	"kumarvv.com/mockdata/models"
@@ -129,15 +129,15 @@ func Validate(config *models.Config) []error {
 			errs = append(errs, errors.Errorf("at least one column is required for table %s", table.Name))
 		} else {
 			for _, column := range table.Columns {
-				if !utils.Includes(valuetypes.List(), column.Type) {
+				if !utils.Includes(functiontypes.List(), column.Type) {
 					errs = append(errs, errors.Errorf("invalid value type %s for table.column %s.%s",
 						table.Name, column.Name, column.Type))
 				} else {
-					if valuetypes.IsRequiredValueExpr(column.Type) && column.Value == nil {
+					if functiontypes.IsRequiredValueExpr(column.Type) && column.Value == nil {
 						errs = append(errs, errors.Errorf("value is required for table.column %s.%s",
 							table.Name, column.Name))
 					}
-					if config.Target.Type != targettypes.SQL && valuetypes.IsDbRequired(column.Type) {
+					if config.Target.Type != targettypes.SQL && functiontypes.IsDbRequired(column.Type) {
 						errs = append(errs, errors.Errorf("target type should be DB for table.column %s.%s and valueType=%s",
 							table.Name, column.Name, column.Type))
 					}
