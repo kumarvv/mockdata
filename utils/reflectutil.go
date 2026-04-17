@@ -35,8 +35,8 @@ func ToString(v interface{}) (s string) {
 	return
 }
 
-// ToInt converts interface{} to int64
-func ToInt(v interface{}) (i int64) {
+// ToInt64 converts interface{} to int64
+func ToInt64(v interface{}) (i int64) {
 	if v == nil {
 		return 0
 	}
@@ -74,6 +74,10 @@ func ToInt(v interface{}) (i int64) {
 		i = 0
 	}
 	return
+}
+
+func ToInt(v interface{}) (i int) {
+	return int(ToInt64(v))
 }
 
 // ToBool converts interface{} to bool
@@ -130,4 +134,12 @@ func ToFloat(v interface{}) (f float64) {
 		f = 0
 	}
 	return
+}
+
+func StrPtr(s string) *string {
+	return &s
+}
+
+func IntPtr(i int) *int {
+	return &i
 }
