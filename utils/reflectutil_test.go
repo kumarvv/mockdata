@@ -33,7 +33,7 @@ func TestToString(t *testing.T) {
 	}
 }
 
-// ---- ToInt ----
+// ---- ToInt64 ----
 
 func TestToInt(t *testing.T) {
 	tests := []struct {
@@ -61,8 +61,8 @@ func TestToInt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ToInt(tt.input); got != tt.want {
-				t.Errorf("ToInt(%v) = %d, want %d", tt.input, got, tt.want)
+			if got := ToInt64(tt.input); got != tt.want {
+				t.Errorf("ToInt64(%v) = %d, want %d", tt.input, got, tt.want)
 			}
 		})
 	}
