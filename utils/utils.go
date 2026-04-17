@@ -32,7 +32,7 @@ func SplitToInt(s, sep string) []int64 {
 	items := strings.Split(s, sep)
 	values := make([]int64, 0)
 	for _, item := range items {
-		values = append(values, ToInt(item))
+		values = append(values, ToInt64(item))
 	}
 	return values
 }
