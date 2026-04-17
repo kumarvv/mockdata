@@ -139,7 +139,7 @@ func IsString(valueType string) bool {
 	}, valueType)
 }
 
-func Params(fnName string) []string {
+func GetParams(fnName string) []string {
 	if fnName == SQL {
 		return []string{"value"}
 	} else if fnName == String {
