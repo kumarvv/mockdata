@@ -35,6 +35,18 @@ type ConfigTable struct {
 
 type ConfigColumn struct {
 	Name      string      `json:"name" yaml:"name"`
+	FnName    string      `json:"fnName" yaml:"fnName"`
+	Value     interface{} `json:"value" yaml:"value"`
+	Min       *int        `json:"min" yaml:"min"`
+	Max       *int        `json:"max" yaml:"max"`
+	Format    *string     `json:"format" yaml:"format"`
+	Case      *string     `json:"case" yaml:"case"`
+	NumPairs  *int        `json:"num_pairs" yaml:"num_pairs"`
+	Separator *string     `json:"separator" yaml:"separator"`
+}
+
+type Column struct {
+	Name      string      `json:"name" yaml:"name"`
 	Type      string      `json:"type" yaml:"type"`
 	Value     interface{} `json:"value" yaml:"value"`
 	Min       *int        `json:"min" yaml:"min"`
