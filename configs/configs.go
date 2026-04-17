@@ -132,7 +132,7 @@ func Validate(config *models.Config) []error {
 			table.Columns = make([]*models.Column, 0)
 			for _, columnMap := range table.RawColumns {
 				for columnName, valueExpr := range columnMap {
-					if column, err := utils.ParseValueExpr(valueExpr); err != nil {
+					if column, err := parseValueExpr(columnName, valueExpr); err != nil {
 						errs = append(errs, errors.Wrapf(err, "failed to parse value expression for table.column %s.%s",
 							table.Name, columnName))
 					} else {
@@ -147,7 +147,7 @@ func Validate(config *models.Config) []error {
 	return errs
 }
 
-func parseValueExpr(name, expr string) (*models.Column, error) {
+func parseValueExpr(columnName, expr string) (*models.Column, error) {
 	expr = strings.TrimSpace(expr)
 
 	// fn start
@@ -185,15 +185,15 @@ func parseValueExpr(name, expr string) (*models.Column, error) {
 		}
 	}
 
-	column := buildColumn(name, fnName, params)
+	column := buildColumn(columnName, fnName, params)
 
 	return &column, nil
 }
 
-func buildColumn(name, fnName string, params map[string]string) models.Column {
+func buildColumn(columnName, fnName string, params map[string]string) models.Column {
 	// column
 	column := models.Column{
-		Name:   name,
+		Name:   columnName,
 		FnName: fnName,
 	}
 
