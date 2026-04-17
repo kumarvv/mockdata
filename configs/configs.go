@@ -44,7 +44,7 @@ func Load(path string) (*models.Config, []error) {
 
 	fillEnvVars(&config)
 
-	if errs := Validate(&config); len(errs) > 0 {
+	if errs := validate(&config); len(errs) > 0 {
 		return nil, errs
 	}
 
@@ -81,7 +81,7 @@ func fillEnvVars(config *models.Config) {
 	}
 }
 
-func Validate(config *models.Config) []error {
+func validate(config *models.Config) []error {
 	if config == nil {
 		return []error{errors.New("config is nil")}
 	}
@@ -126,19 +126,15 @@ func Validate(config *models.Config) []error {
 			errs = append(errs, errors.Errorf("invalid table mode %s for table %s", table.Mode, table.Name))
 		}
 
-		if len(table.RawColumns) == 0 {
-			errs = append(errs, errors.Errorf("at least one column is required for table %s", table.Name))
-		} else {
-			table.Columns = make([]*models.Column, 0)
-			for _, columnMap := range table.RawColumns {
-				for columnName, valueExpr := range columnMap {
-					if column, err := parseValueExpr(columnName, valueExpr); err != nil {
-						errs = append(errs, errors.Wrapf(err, "failed to parse value expression for table.column %s.%s",
-							table.Name, columnName))
-					} else {
-						column.Name = columnName
-						table.Columns = append(table.Columns, column)
-					}
+		table.Columns = make([]*models.Column, 0)
+		for _, columnMap := range table.RawColumns {
+			for columnName, valueExpr := range columnMap {
+				if column, err := parseValueExpr(columnName, valueExpr); err != nil {
+					errs = append(errs, errors.Wrapf(err, "failed to parse value expression for table.column %s.%s",
+						table.Name, columnName))
+				} else {
+					column.Name = columnName
+					table.Columns = append(table.Columns, column)
 				}
 			}
 		}
@@ -166,26 +162,36 @@ func parseValueExpr(columnName, expr string) (*models.Column, error) {
 	if utils.IsBlank(fnName) {
 		return nil, fmt.Errorf("function name required")
 	}
+	if !utils.Includes(functiontypes.List(), fnName) {
+		return nil, fmt.Errorf("invalid function name [%s]", fnName)
+	}
 
 	// params
-	paramsExpr := expr[fs+1 : fe]
-	paramsKVs := strings.Split(paramsExpr, ",")
 	params := make(map[string]string)
-	for _, paramKV := range paramsKVs {
-		items := strings.Split(paramKV, "=")
-		if len(items) > 1 {
-			paramKey := strings.TrimSpace(items[0])
-			if !utils.Includes(functiontypes.GetParams(fnName), paramKey) {
-				return nil, fmt.Errorf("invalid param key [%s] for function [%s]", paramKey, fnName)
+	paramsExpr := expr[fs+1 : fe]
+	if !utils.IsBlank(paramsExpr) {
+		paramsKVs := strings.Split(paramsExpr, ",")
+		for _, paramKV := range paramsKVs {
+			items := strings.Split(paramKV, "=")
+			if len(items) > 1 {
+				paramKey := strings.TrimSpace(items[0])
+				if !utils.Includes(functiontypes.GetParams(fnName), paramKey) {
+					return nil, fmt.Errorf("invalid param key [%s] for function [%s]", paramKey, fnName)
+				}
+				params[paramKey] = strings.TrimSpace(items[1])
+			} else {
+				// simple value becomes key "value"
+				params["value"] = strings.TrimSpace(items[0])
 			}
-			params[paramKey] = strings.TrimSpace(items[1])
-		} else {
-			// simple value becomes key "value"
-			params["value"] = strings.TrimSpace(items[0])
 		}
 	}
 
 	column := buildColumn(columnName, fnName, params)
+
+	// value param required
+	if column.Value == nil && functiontypes.IsRequiredValueExpr(fnName) {
+		return nil, fmt.Errorf("value param required: %s", expr)
+	}
 
 	return &column, nil
 }
