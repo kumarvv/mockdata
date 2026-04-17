@@ -14,8 +14,8 @@ package models
 
 // Config defines the structure of Config data
 type Config struct {
-	Target ConfigTarget  `json:"target" yaml:"target"`
-	Tables []ConfigTable `json:"tables" yaml:"tables"`
+	Target ConfigTarget   `json:"target" yaml:"target"`
+	Tables []*ConfigTable `json:"tables" yaml:"tables"`
 }
 
 type ConfigTarget struct {
