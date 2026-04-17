@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -125,21 +126,18 @@ func Validate(config *models.Config) []error {
 			errs = append(errs, errors.Errorf("invalid table mode %s for table %s", table.Mode, table.Name))
 		}
 
-		if len(table.Columns) == 0 {
+		if len(table.RawColumns) == 0 {
 			errs = append(errs, errors.Errorf("at least one column is required for table %s", table.Name))
 		} else {
-			for _, column := range table.Columns {
-				if !utils.Includes(functiontypes.List(), column.Type) {
-					errs = append(errs, errors.Errorf("invalid value type %s for table.column %s.%s",
-						table.Name, column.Name, column.Type))
-				} else {
-					if functiontypes.IsRequiredValueExpr(column.Type) && column.Value == nil {
-						errs = append(errs, errors.Errorf("value is required for table.column %s.%s",
-							table.Name, column.Name))
-					}
-					if config.Target.Type != targettypes.SQL && functiontypes.IsDbRequired(column.Type) {
-						errs = append(errs, errors.Errorf("target type should be DB for table.column %s.%s and valueType=%s",
-							table.Name, column.Name, column.Type))
+			table.Columns = make([]*models.Column, 0)
+			for _, columnMap := range table.RawColumns {
+				for columnName, valueExpr := range columnMap {
+					if column, err := utils.ParseValueExpr(valueExpr); err != nil {
+						errs = append(errs, errors.Wrapf(err, "failed to parse value expression for table.column %s.%s",
+							table.Name, columnName))
+					} else {
+						column.Name = columnName
+						table.Columns = append(table.Columns, column)
 					}
 				}
 			}
@@ -147,4 +145,77 @@ func Validate(config *models.Config) []error {
 	}
 
 	return errs
+}
+
+func parseValueExpr(name, expr string) (*models.Column, error) {
+	expr = strings.TrimSpace(expr)
+
+	// fn start
+	fs := strings.Index(expr, "(")
+	if fs == -1 {
+		return nil, fmt.Errorf("function expression required: %s", expr)
+	}
+	// fn end
+	fe := strings.Index(expr, ")")
+	if fe == -1 {
+		return nil, fmt.Errorf("valid function expression required - missing ')' : %s", expr)
+	}
+
+	// fn name
+	fnName := expr[:fs]
+	if utils.IsBlank(fnName) {
+		return nil, fmt.Errorf("function name required")
+	}
+
+	// params
+	paramsExpr := expr[fs+1 : fe]
+	paramsKVs := strings.Split(paramsExpr, ",")
+	params := make(map[string]string)
+	for _, paramKV := range paramsKVs {
+		items := strings.Split(paramKV, "=")
+		if len(items) > 1 {
+			paramKey := strings.TrimSpace(items[0])
+			if !utils.Includes(functiontypes.GetParams(fnName), paramKey) {
+				return nil, fmt.Errorf("invalid param key [%s] for function [%s]", paramKey, fnName)
+			}
+			params[paramKey] = strings.TrimSpace(items[1])
+		} else {
+			// simple value becomes key "value"
+			params["value"] = strings.TrimSpace(items[0])
+		}
+	}
+
+	column := buildColumn(name, fnName, params)
+
+	return &column, nil
+}
+
+func buildColumn(name, fnName string, params map[string]string) models.Column {
+	// column
+	column := models.Column{
+		Name:   name,
+		FnName: fnName,
+	}
+
+	for k, v := range params {
+		if k == "value" {
+			column.Value = v
+		} else if k == "len" {
+			column.Len = utils.IntPtr(utils.ToInt(v))
+		} else if k == "min" {
+			column.Min = utils.IntPtr(utils.ToInt(v))
+		} else if k == "max" {
+			column.Max = utils.IntPtr(utils.ToInt(v))
+		} else if k == "format" {
+			column.Format = utils.StrPtr(utils.ToString(v))
+		} else if k == "case" {
+			column.Case = utils.StrPtr(utils.ToString(v))
+		} else if k == "numpairs" {
+			column.NumPairs = utils.IntPtr(utils.ToInt(v))
+		} else if k == "separator" {
+			column.Separator = utils.StrPtr(utils.ToString(v))
+		}
+	}
+
+	return column
 }
