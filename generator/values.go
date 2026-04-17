@@ -196,22 +196,18 @@ func withCase(column *models.Column, value string) string {
 }
 
 func withLen(column *models.Column, value string) string {
-	if column.Max == nil && column.Min == nil {
-		return value
-	}
-
 	lValue := value
 
 	if column.Len != nil {
 		for len(lValue) < *column.Len {
-			lValue = value + randomdata.SillyName()
+			lValue = lValue + randomdata.SillyName()
 		}
 		return lValue[:*column.Len]
 	}
 
 	if column.Min != nil && len(value) < *column.Min {
 		for len(lValue) < *column.Min {
-			lValue = value + randomdata.SillyName()
+			lValue = lValue + randomdata.SillyName()
 		}
 	}
 	if column.Max != nil && len(lValue) > *column.Max {
