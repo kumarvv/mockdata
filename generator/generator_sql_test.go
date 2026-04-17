@@ -11,9 +11,9 @@ import (
 // helpers
 
 func makeTable(name string, cols ...string) *models.ConfigTable {
-	columns := make([]models.ConfigColumn, len(cols))
+	columns := make([]*models.Column, len(cols))
 	for i, c := range cols {
-		columns[i] = models.ConfigColumn{Name: c}
+		columns[i] = &models.Column{Name: c}
 	}
 	return &models.ConfigTable{Name: name, Columns: columns}
 }

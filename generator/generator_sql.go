@@ -11,7 +11,7 @@ import (
 
 const insertTemplate = `INSER INTO %s 
 	(%s) 
-VALUES 
+	VALUES 
 	(%s); `
 
 func generateSQL(ctx context.Context, table *models.ConfigTable, rows []map[string]interface{}) ([]byte, error) {
