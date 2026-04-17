@@ -1,4 +1,4 @@
-package valuetypes
+package functiontypes
 
 import "kumarvv.com/mockdata/utils"
 
@@ -137,4 +137,89 @@ func IsString(valueType string) bool {
 		RandomPhone,
 		RandomInString,
 	}, valueType)
+}
+
+func Params(fnName string) []string {
+	if fnName == SQL {
+		return []string{"value"}
+	} else if fnName == String {
+		return []string{"value"}
+	} else if fnName == Integer {
+		return []string{"value"}
+	} else if fnName == Float {
+		return []string{"value"}
+	} else if fnName == Boolean {
+		return []string{"value"}
+	} else if fnName == Date {
+		return []string{"value"}
+	} else if fnName == DateTime {
+		return []string{"value"}
+	} else if fnName == Serial {
+		return []string{"start"}
+	} else if fnName == UUID {
+		return []string{}
+	} else if fnName == RandomString {
+		return []string{"len", "min", "max", "case"}
+	} else if fnName == RandomTitle {
+		return []string{"gender", "case"}
+	} else if fnName == RandomGender {
+		return []string{"case"}
+	} else if fnName == RandomFirstName {
+		return []string{"gender", "case"}
+	} else if fnName == RandomLastName {
+		return []string{"case"}
+	} else if fnName == RandomFullName {
+		return []string{"gender", "case"}
+	} else if fnName == RandomEmail {
+		return []string{"case", "domain"}
+	} else if fnName == RandomCurrency {
+		return []string{"case"}
+	} else if fnName == RandomAddress {
+		return []string{"case", "country"}
+	} else if fnName == RandomStreet {
+		return []string{"case"}
+	} else if fnName == RandomCity {
+		return []string{"case", "country"}
+	} else if fnName == RandomState {
+		return []string{"case", "country"}
+	} else if fnName == RandomState2 {
+		return []string{"case", "country"}
+	} else if fnName == RandomCountry {
+		return []string{"case"}
+	} else if fnName == RandomCountry2 {
+		return []string{"case"}
+	} else if fnName == RandomCountry3 {
+		return []string{"case"}
+	} else if fnName == RandomNumber {
+		return []string{"min", "max"}
+	} else if fnName == RandomDecimal {
+		return []string{"min", "max"}
+	} else if fnName == RandomBoolean {
+		return []string{}
+	} else if fnName == RandomParagraph {
+		return []string{"len", "min", "max", "case"}
+	} else if fnName == RandomFormat {
+		return []string{"numOfPairs", "separator"}
+	} else if fnName == RandomDate {
+		return []string{"format"}
+	} else if fnName == RandomDay {
+		return []string{}
+	} else if fnName == RandomMonth {
+		return []string{}
+	} else if fnName == RandomYear {
+		return []string{}
+	} else if fnName == RandomPhone {
+		return []string{}
+	} else if fnName == RandomInString {
+		return []string{"value"}
+	} else if fnName == RandomInInteger {
+		return []string{"value"}
+	} else if fnName == RandomInFloat {
+		return []string{"value"}
+	} else if fnName == RandomRange {
+		return []string{"min", "max"}
+	} else if fnName == RandomFromSQL {
+		return []string{"value"}
+	}
+	return []string{}
 }
