@@ -39,7 +39,7 @@ func Generate(ctx context.Context, config *models.Config) error {
 			row := make(map[string]interface{})
 			gender := utils.RandomOneOf(randomdata.Male, randomdata.Female)
 			for _, column := range table.Columns {
-				if value, err := generateValue(ctx, &table, &column, gender, r); err != nil {
+				if value, err := generateValue(&table, column, gender, r); err != nil {
 					return errors.Wrapf(err, "failed to generate value for table(%d of %d): name=%s, column=%s", i+1,
 						len(config.Tables), table.Name, column.Name)
 				} else {
