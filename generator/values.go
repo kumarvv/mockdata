@@ -201,6 +201,14 @@ func withLen(column *models.Column, value string) string {
 	}
 
 	lValue := value
+
+	if column.Len != nil {
+		for len(lValue) < *column.Len {
+			lValue = value + randomdata.SillyName()
+		}
+		return lValue[:*column.Len]
+	}
+
 	if column.Min != nil && len(value) < *column.Min {
 		for len(lValue) < *column.Min {
 			lValue = value + randomdata.SillyName()
