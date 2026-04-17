@@ -1,7 +1,6 @@
 package generator
 
 import (
-	"context"
 	"strings"
 
 	"github.com/Pallinder/go-randomdata"
@@ -12,12 +11,12 @@ import (
 )
 
 type valueGen struct {
-	column *models.ConfigColumn
+	column *models.Column
 	value  interface{}
 	err    error
 }
 
-func getValue(column *models.ConfigColumn, value interface{}) *valueGen {
+func getValue(column *models.Column, value interface{}) *valueGen {
 	return &valueGen{
 		column: column,
 		value:  value,
@@ -25,7 +24,7 @@ func getValue(column *models.ConfigColumn, value interface{}) *valueGen {
 	}
 }
 func (v *valueGen) Value() (interface{}, error) {
-	if functiontypes.IsString(v.column.Type) {
+	if functiontypes.IsString(v.column.FnName) {
 		valueStr := utils.ToString(v.value)
 		valueStr = withLen(v.column, valueStr)
 		valueStr = withCase(v.column, valueStr)
@@ -35,8 +34,8 @@ func (v *valueGen) Value() (interface{}, error) {
 	}
 }
 
-func generateValue(ctx context.Context, table *models.ConfigTable, column *models.ConfigColumn, gender, ix int) (interface{}, error) {
-	valueType := column.Type
+func generateValue(table *models.ConfigTable, column *models.Column, gender, ix int) (interface{}, error) {
+	valueType := column.FnName
 	value := column.Value
 	var err error
 	if valueType == functiontypes.SQL {
@@ -44,7 +43,7 @@ func generateValue(ctx context.Context, table *models.ConfigTable, column *model
 	} else if valueType == functiontypes.String {
 		value, err = getValue(column, utils.ToString(column.Value)).Value()
 	} else if valueType == functiontypes.Integer {
-		value, err = getValue(column, utils.ToInt(column.Value)).Value()
+		value, err = getValue(column, utils.ToInt64(column.Value)).Value()
 	} else if valueType == functiontypes.Float {
 		value, err = getValue(column, utils.ToFloat(column.Value)).Value()
 	} else if valueType == functiontypes.Boolean {
@@ -183,7 +182,7 @@ func generateValue(ctx context.Context, table *models.ConfigTable, column *model
 	return value, err
 }
 
-func withCase(column *models.ConfigColumn, value string) string {
+func withCase(column *models.Column, value string) string {
 	if column.Case == nil {
 		return value
 	}
@@ -196,7 +195,7 @@ func withCase(column *models.ConfigColumn, value string) string {
 	}
 }
 
-func withLen(column *models.ConfigColumn, value string) string {
+func withLen(column *models.Column, value string) string {
 	if column.Max == nil && column.Min == nil {
 		return value
 	}
