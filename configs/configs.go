@@ -130,7 +130,7 @@ func validate(config *models.Config) []error {
 		for _, columnMap := range table.RawColumns {
 			for columnName, valueExpr := range columnMap {
 				if column, err := parseValueExpr(columnName, valueExpr); err != nil {
-					errs = append(errs, errors.Wrapf(err, "failed to parse value expression for table.column %s.%s",
+					errs = append(errs, errors.Wrapf(err, "failed to parse table.column [%s.%s]",
 						table.Name, columnName))
 				} else {
 					column.Name = columnName
@@ -176,7 +176,7 @@ func parseValueExpr(columnName, expr string) (*models.Column, error) {
 			if len(items) > 1 {
 				paramKey := strings.TrimSpace(items[0])
 				if !utils.Includes(functiontypes.GetParams(fnName), paramKey) {
-					return nil, fmt.Errorf("invalid param key [%s] for function [%s]", paramKey, fnName)
+					return nil, fmt.Errorf("invalid param key [%s]: %s", paramKey, expr)
 				}
 				params[paramKey] = strings.TrimSpace(items[1])
 			} else {
