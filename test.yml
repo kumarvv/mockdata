@@ -1,17 +1,17 @@
 target:
-  type: sql
+  type: json
   to_path: /Users/kumarvv/dev/temp
 
 tables:
   - name: tags
     mode: append
-    row_count: 1000
+    row_count: 5
     columns:
       - uuid: uuid()
       - username: random_string(len=25, case=upper)
-      - full_name: random_full_name(gender=male, case=upper)
+      - full_name: random_full_name(gender=male)
       - email: random_email()
       - created_at: random_date()
       - sys_key: string(ABCD)
       - is_active: boolean(true)
-      - version: integer(1)
+      - version: integer(123)
