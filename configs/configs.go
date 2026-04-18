@@ -7,7 +7,6 @@ import (
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
-	"kumarvv.com/mockdata/constants/dbtypes"
 	"kumarvv.com/mockdata/constants/functiontypes"
 	"kumarvv.com/mockdata/constants/tablemodes"
 	"kumarvv.com/mockdata/constants/targettypes"
@@ -95,20 +94,9 @@ func validate(config *models.Config) []error {
 	if !utils.Includes(targettypes.List(), config.Target.Type) {
 		errs = append(errs, errors.Errorf("invalid target type %s", config.Target.Type))
 	}
-	// target type: db
-	if config.Target.Type == targettypes.DB {
-		if utils.IsBlank(config.Target.DbType) {
-			errs = append(errs, errors.New("db_type is required"))
-		} else if !utils.Includes(dbtypes.List(), config.Target.DbType) {
-			errs = append(errs, errors.Errorf("invalid db_type %s", config.Target.DbType))
-		}
-		if utils.IsBlank(config.Target.DbConnStr) {
-			errs = append(errs, errors.New("db_conn_str is required"))
-		}
-	} else {
-		if utils.IsBlank(config.Target.ToPath) {
-			errs = append(errs, errors.New("to_path is required"))
-		}
+	// target path required
+	if utils.IsBlank(config.Target.ToPath) {
+		errs = append(errs, errors.New("to_path is required"))
 	}
 
 	// tables
