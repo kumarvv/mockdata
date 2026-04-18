@@ -4,65 +4,29 @@ target:
 
 tables:
   - name: users
-    mode: append
-    row_count: 5
+    row_count: 10
     columns:
-      - name: stock_price
-        type: float
-        value: 123.47
-      - name: is_active
-        type: boolean
-        value: true
-      - name: open_date
-        type: date
-        value: 2018-03-23
-      - name: start_date
-        type: datetime
-        value: 2018-03-23 15:45
-      - name: uuid
-        type: uuid
-      - name: username
-        type: random_string
-        value: 10,upper
-      - name: title
-        type: random_title
-      - name: first_name
-        type: random_first_name
-        value: male
-      - name: last_name
-        type: random_last_name
-        value: male
-      - name: full_name
-        type: random_string
-      - name: gender
-        type: random_gender
-      - email: random_email
-      - name: description
-        type: random_string
-        value: 5,100
-      - name: address
-        type: random_address
-        value: US
-      - name: street
-        type: random_street
-        value: US
-      - name: city
-        type: random_city
-        value: US
-      - name: state
-        type: random_state
-        value: US
-      - name: country
-        type: random_country2
-      - name: user_type
-        type: random_in
-        value: admin,normal,viewer
-      - name: source
-        type: string
-        value: generated
-      - name: is_active
-        type: boolean
-        value: true
-      - name: created_at
-        type: random_date
+      - stock_price: float(123.47)
+      - is_active: boolean(true)
+      - open_date: date(2018-03-23)
+      - start_date: datetime(2018-03-23 15:45:00)
+      - uuid: uuid()
+      - username: random_string(len=10,case=upper)
+      - title: random_title(gender=male)
+      - first_name: random_first_name(gender=male)
+      - last_name: random_last_name()
+      - full_name: random_full_name()
+      - gender: random_gender()
+      - email: random_email()
+      - description: random_string(min=5,max=100)
+      - address: random_address()
+      - street: random_street()
+      - city: random_city()
+      - state: random_state()
+      - country: random_country2()
+      - user_type: random_in_string(admin|normal|viewer)
+      - rating: random_in_integer(1|2|3|4|5)
+      - source: string(TVISH)
+      - is_active: boolean(true)
+      - created_at: random_date()
 
