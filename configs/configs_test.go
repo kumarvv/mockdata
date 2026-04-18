@@ -20,7 +20,7 @@ func writeTempYAML(t *testing.T, content string) string {
 	if _, err := f.WriteString(content); err != nil {
 		t.Fatalf("could not write temp file: %v", err)
 	}
-	f.Close()
+	_ = f.Close()
 	return f.Name()
 }
 
@@ -80,7 +80,7 @@ func TestFillEnvVars(t *testing.T) {
 	})
 
 	t.Run("token with unset env var replaced with empty string", func(t *testing.T) {
-		os.Unsetenv("UNSET_VAR")
+		_ = os.Unsetenv("UNSET_VAR")
 		cfg := &models.Config{Target: models.ConfigTarget{DbConnStr: "host=%%UNSET_VAR%%"}}
 		fillEnvVars(cfg)
 		if cfg.Target.DbConnStr != "host=" {
