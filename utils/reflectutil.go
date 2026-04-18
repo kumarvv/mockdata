@@ -9,8 +9,7 @@ import (
 )
 
 const (
-	typeTime      = "time.Time"
-	DateFormatYMD = "2006-01-02"
+	typeTime = "time.Time"
 )
 
 // ToString converts interface{} to string
@@ -113,7 +112,7 @@ func ToTimeFormat(v interface{}, format string) (t time.Time, err error) {
 	return
 }
 func ToTime(v interface{}) (t time.Time, err error) {
-	return ToTimeFormat(v, DateFormatYMD)
+	return ToTimeFormat(v, time.DateOnly)
 }
 
 // ToFloat converts interface{} to float64
