@@ -1,5 +1,5 @@
 target:
-  type: json
+  type: csv
   to_path: /Users/kumarvv/dev/temp
 
 tables:
