@@ -41,43 +41,11 @@ func Load(path string) (*models.Config, []error) {
 		return nil, []error{err}
 	}
 
-	fillEnvVars(&config)
-
 	if errs := validate(&config); len(errs) > 0 {
 		return nil, errs
 	}
 
 	return &config, nil
-}
-
-func fillEnvVars(config *models.Config) {
-	if utils.IsBlank(config.Target.DbConnStr) {
-		return
-	}
-
-	str := config.Target.DbConnStr
-	tokens := make([]string, 0)
-	for {
-		startx := strings.Index(str, "%%")
-		if startx <= 0 {
-			break
-		}
-		startx += 2
-
-		rstr := str[startx:]
-		endx := strings.Index(rstr, "%%")
-		if endx <= 0 {
-			break
-		}
-
-		tokens = append(tokens, str[startx:startx+endx])
-		str = str[startx+endx+2:]
-	}
-
-	for _, token := range tokens {
-		value := os.Getenv(token)
-		config.Target.DbConnStr = strings.ReplaceAll(config.Target.DbConnStr, "%%"+token+"%%", value)
-	}
 }
 
 func validate(config *models.Config) []error {

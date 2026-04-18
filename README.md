@@ -73,8 +73,6 @@ tables:
 |--------------|----------|-------------|
 | `type`       | Yes      | Output format — `json`, `csv`, or `sql` |
 | `to_path`    | Yes      | Directory path where output files are written |
-| `db_type`    | No       | Database type for SQL execution — `sqlite`, `postgresql`, `mysql` |
-| `db_conn_str`| No       | Database connection string; supports `%%ENV_VAR%%` tokens for environment variable substitution |
 
 ### Table Fields
 
@@ -154,16 +152,6 @@ target:
 Output example (`users.sql`):
 ```sql
 INSERT INTO users (id, name, email) VALUES ('a1b2c3d4-...', 'Jane Smith', 'jane.smith@example.com');
-```
-
-For executing against a live database, add `db_type` and `db_conn_str` to the target config. Environment variables can be injected using `%%VAR_NAME%%` tokens:
-
-```yaml
-target:
-  type: sql
-  to_path: /output
-  db_type: postgresql
-  db_conn_str: "postgres://user:%%DB_PASS%%@%%DB_HOST%%:5432/mydb"
 ```
 
 ---

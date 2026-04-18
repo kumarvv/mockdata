@@ -19,10 +19,8 @@ type Config struct {
 }
 
 type ConfigTarget struct {
-	Type      string `json:"type" yaml:"type"`
-	DbType    string `json:"db_type" yaml:"db_type"`
-	DbConnStr string `json:"db_conn_str" yaml:"db_conn_str"`
-	ToPath    string `json:"to_path" yaml:"to_path"`
+	Type   string `json:"type" yaml:"type"`
+	ToPath string `json:"to_path" yaml:"to_path"`
 }
 
 // ConfigTable defines the structure of Table specific overrides
