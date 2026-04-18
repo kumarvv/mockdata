@@ -166,7 +166,7 @@ func TestToTimeFormat(t *testing.T) {
 		{"RFC3339 string", "2024-06-15T10:30:00Z", time.RFC3339, time.Date(2024, 6, 15, 10, 30, 0, 0, time.UTC), false},
 		{"custom format", "15/06/2024", "02/01/2006", time.Date(2024, 6, 15, 0, 0, 0, 0, time.UTC), false},
 		{"invalid string", "bad", time.RFC3339, time.Time{}, true},
-		{"time.Time passthrough", time.Date(2023, 3, 10, 0, 0, 0, 0, time.UTC), DateFormatYMD, time.Date(2023, 3, 10, 0, 0, 0, 0, time.UTC), false},
+		{"time.Time passthrough", time.Date(2023, 3, 10, 0, 0, 0, 0, time.UTC), time.DateOnly, time.Date(2023, 3, 10, 0, 0, 0, 0, time.UTC), false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
