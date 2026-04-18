@@ -15,3 +15,4 @@ tables:
       - sys_key: string(ABCD)
       - is_active: boolean(true)
       - version: integer(123)
+      - rating: random_in_integer(1|2|3|4|5)
