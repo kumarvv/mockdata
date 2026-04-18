@@ -268,7 +268,7 @@ func TestGenerateValue_FixedTypes(t *testing.T) {
 	})
 
 	t.Run("datetime returns time.Time", func(t *testing.T) {
-		c := colWithValue(functiontypes.DateTime, "2024-06-15")
+		c := colWithValue(functiontypes.DateTime, "2024-06-15 12:31:00")
 		got, err := generateValue(table, c, randomdata.Male, 0)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -674,8 +674,8 @@ func TestGenerateValue_RandomDate(t *testing.T) {
 func TestGenerateValue_RandomIn(t *testing.T) {
 	table := simpleTable()
 
-	t.Run("random_in_string picks from comma-separated values", func(t *testing.T) {
-		c := colWithValue(functiontypes.RandomInString, "alpha,beta,gamma")
+	t.Run("random_in_string picks from pipe-separated values", func(t *testing.T) {
+		c := colWithValue(functiontypes.RandomInString, "alpha|beta|gamma")
 		allowed := []string{"alpha", "beta", "gamma"}
 		for i := 0; i < 30; i++ {
 			got, err := generateValue(table, c, randomdata.Male, i)
@@ -689,8 +689,8 @@ func TestGenerateValue_RandomIn(t *testing.T) {
 		}
 	})
 
-	t.Run("random_in_integer picks from comma-separated integers", func(t *testing.T) {
-		c := colWithValue(functiontypes.RandomInInteger, "10,20,30")
+	t.Run("random_in_integer picks from pipe-separated integers", func(t *testing.T) {
+		c := colWithValue(functiontypes.RandomInInteger, "10|20|30")
 		allowed := []int64{10, 20, 30}
 		for i := 0; i < 30; i++ {
 			got, err := generateValue(table, c, randomdata.Male, i)
@@ -711,8 +711,8 @@ func TestGenerateValue_RandomIn(t *testing.T) {
 		}
 	})
 
-	t.Run("random_in_float picks from comma-separated floats", func(t *testing.T) {
-		c := colWithValue(functiontypes.RandomInFloat, "1.1,2.2,3.3")
+	t.Run("random_in_float picks from pipe-separated floats", func(t *testing.T) {
+		c := colWithValue(functiontypes.RandomInFloat, "1.1|2.2|3.3")
 		allowed := []float64{1.1, 2.2, 3.3}
 		for i := 0; i < 30; i++ {
 			got, err := generateValue(table, c, randomdata.Male, i)
@@ -734,7 +734,7 @@ func TestGenerateValue_RandomIn(t *testing.T) {
 	})
 
 	t.Run("random_in_string returns all options eventually", func(t *testing.T) {
-		c := colWithValue(functiontypes.RandomInString, "x,y,z")
+		c := colWithValue(functiontypes.RandomInString, "x|y|z")
 		seen := map[string]bool{}
 		for i := 0; i < 200; i++ {
 			got, _ := generateValue(table, c, randomdata.Male, i)
