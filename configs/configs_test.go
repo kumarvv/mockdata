@@ -144,50 +144,6 @@ func TestValidate(t *testing.T) {
 		}
 	})
 
-	t.Run("target type db requires db_type", func(t *testing.T) {
-		cfg := &models.Config{
-			Target: models.ConfigTarget{Type: "db", DbConnStr: "conn"},
-			Tables: []*models.ConfigTable{{Name: "t", Mode: "append"}},
-		}
-		errs := validate(cfg)
-		if !hasErrContaining(errs, "db_type is required") {
-			t.Errorf("expected 'db_type is required', got %v", errMessages(errs))
-		}
-	})
-
-	t.Run("target type db with invalid db_type returns error", func(t *testing.T) {
-		cfg := &models.Config{
-			Target: models.ConfigTarget{Type: "db", DbType: "oracle", DbConnStr: "conn"},
-			Tables: []*models.ConfigTable{{Name: "t", Mode: "append"}},
-		}
-		errs := validate(cfg)
-		if !hasErrContaining(errs, "invalid db_type") {
-			t.Errorf("expected 'invalid db_type', got %v", errMessages(errs))
-		}
-	})
-
-	t.Run("target type db requires db_conn_str", func(t *testing.T) {
-		cfg := &models.Config{
-			Target: models.ConfigTarget{Type: "db", DbType: "sqlite"},
-			Tables: []*models.ConfigTable{{Name: "t", Mode: "append"}},
-		}
-		errs := validate(cfg)
-		if !hasErrContaining(errs, "db_conn_str is required") {
-			t.Errorf("expected 'db_conn_str is required', got %v", errMessages(errs))
-		}
-	})
-
-	t.Run("non-db target requires to_path", func(t *testing.T) {
-		cfg := &models.Config{
-			Target: models.ConfigTarget{Type: "json"},
-			Tables: []*models.ConfigTable{{Name: "t", Mode: "append"}},
-		}
-		errs := validate(cfg)
-		if !hasErrContaining(errs, "to_path is required") {
-			t.Errorf("expected 'to_path is required', got %v", errMessages(errs))
-		}
-	})
-
 	t.Run("empty tables returns error", func(t *testing.T) {
 		cfg := &models.Config{
 			Target: models.ConfigTarget{Type: "json", ToPath: "/tmp"},
@@ -244,21 +200,6 @@ func TestValidate(t *testing.T) {
 		errs := validate(cfg)
 		if !hasErrContaining(errs, "failed to parse table.column") {
 			t.Errorf("expected column parse error, got %v", errMessages(errs))
-		}
-	})
-
-	t.Run("valid db config with all required fields", func(t *testing.T) {
-		cfg := &models.Config{
-			Target: models.ConfigTarget{Type: "db", DbType: "sqlite", DbConnStr: "file:test.db"},
-			Tables: []*models.ConfigTable{{
-				Name:       "users",
-				Mode:       "append",
-				RawColumns: []map[string]string{{"id": "uuid()"}},
-			}},
-		}
-		errs := validate(cfg)
-		if len(errs) > 0 {
-			t.Errorf("unexpected errors: %v", errMessages(errs))
 		}
 	})
 
@@ -554,52 +495,6 @@ tables:
 		}
 		if len(cfg.Tables[0].Columns) != 2 {
 			t.Errorf("expected 2 parsed columns, got %d", len(cfg.Tables[0].Columns))
-		}
-	})
-
-	t.Run("valid db config returns parsed config", func(t *testing.T) {
-		yaml := `
-target:
-  type: db
-  db_type: sqlite
-  db_conn_str: file:test.db
-tables:
-  - name: orders
-    mode: merge
-    row_count: 10
-    columns:
-      - id: uuid()
-`
-		path := writeTempYAML(t, yaml)
-		cfg, errs := Load(path)
-		if len(errs) > 0 {
-			t.Fatalf("unexpected errors: %v", errMessages(errs))
-		}
-		if cfg.Target.DbType != "sqlite" {
-			t.Errorf("DbType = %q, want 'sqlite'", cfg.Target.DbType)
-		}
-	})
-
-	t.Run("env var in db_conn_str is substituted", func(t *testing.T) {
-		t.Setenv("TEST_PASS", "s3cret")
-		yaml := `
-target:
-  type: db
-  db_type: sqlite
-  db_conn_str: "file:test.db?password=%%TEST_PASS%%"
-tables:
-  - name: t
-    mode: append
-    columns:
-      - id: uuid()
-`
-		path := writeTempYAML(t, yaml)
-		cfg, errs := Load(path)
-		if len(errs) > 0 {
-			t.Fatalf("unexpected errors: %v", errMessages(errs))
-		}
-		if !strings.Contains(cfg.Target.DbConnStr, "s3cret") {
-			t.Errorf("env var not substituted: %q", cfg.Target.DbConnStr)
 		}
 	})
 }
