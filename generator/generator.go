@@ -66,6 +66,10 @@ func Generate(ctx context.Context, config *models.Config) error {
 			if b, err = generateSQL(ctx, table, rows); err != nil {
 				return errors.Wrapf(err, "failed to generate sql data: %s", tablePath)
 			}
+		} else if targetType == targettypes.CSV {
+			if b, err = generateCSV(ctx, table, rows); err != nil {
+				return errors.Wrapf(err, "failed to generate csv data: %s", tablePath)
+			}
 		}
 
 		utils.Log("creating %s file at tablePath=%s", targetType, tablePath)
