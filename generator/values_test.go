@@ -505,7 +505,7 @@ func TestGenerateValue_RandomNumber(t *testing.T) {
 			}
 		}()
 		c := col(functiontypes.RandomNumber)
-		generateValue(table, c, randomdata.Male, 0) //nolint
+		_, _ = generateValue(table, c, randomdata.Male, 0) //nolint
 	})
 
 	t.Run("random_number with min and max", func(t *testing.T) {
@@ -558,7 +558,7 @@ func TestGenerateValue_RandomDecimal(t *testing.T) {
 			}
 		}()
 		c := col(functiontypes.RandomDecimal)
-		generateValue(table, c, randomdata.Male, 0) //nolint
+		_, _ = generateValue(table, c, randomdata.Male, 0) //nolint
 	})
 
 	t.Run("random_decimal with min and max", func(t *testing.T) {
@@ -797,7 +797,7 @@ func TestGenerateValue_RandomRange(t *testing.T) {
 			}
 		}()
 		c := col(functiontypes.RandomRange)
-		generateValue(table, c, randomdata.Male, 0) //nolint
+		_, _ = generateValue(table, c, randomdata.Male, 0) //nolint
 	})
 }
 
