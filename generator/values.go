@@ -2,6 +2,7 @@ package generator
 
 import (
 	"strings"
+	"time"
 
 	"github.com/Pallinder/go-randomdata"
 	"github.com/google/uuid"
@@ -58,7 +59,7 @@ func generateValue(table *models.ConfigTable, column *models.Column, gender, ix 
 		if column.Format != nil {
 			value, err = utils.ToTimeFormat(column.Value, *column.Format)
 		} else {
-			value, err = utils.ToTime(column.Value)
+			value, err = utils.ToTimeFormat(column.Value, time.DateTime)
 		}
 	} else if valueType == functiontypes.Serial {
 		minValue := 1
@@ -142,7 +143,7 @@ func generateValue(table *models.ConfigTable, column *models.Column, gender, ix 
 			if column.Format != nil {
 				value = dt.Format(*column.Format)
 			} else {
-				value = dt.Format(utils.DateFormatYMD)
+				value = dt.Format(time.DateOnly)
 			}
 		}
 	} else if valueType == functiontypes.RandomDay {
@@ -155,15 +156,15 @@ func generateValue(table *models.ConfigTable, column *models.Column, gender, ix 
 		value = randomdata.PhoneNumber()
 	} else if valueType == functiontypes.RandomInString {
 		valueStr := utils.ToString(column.Value)
-		tokens := strings.Split(valueStr, ",")
+		tokens := strings.Split(valueStr, "|")
 		value = utils.RandomOneOf(tokens...)
 	} else if valueType == functiontypes.RandomInInteger {
 		valueStr := utils.ToString(column.Value)
-		tokens := utils.SplitToInt(valueStr, ",")
+		tokens := utils.SplitToInt(valueStr, "|")
 		value = utils.RandomOneOf(tokens...)
 	} else if valueType == functiontypes.RandomInFloat {
 		valueStr := utils.ToString(column.Value)
-		tokens := utils.SplitToFloat(valueStr, ",")
+		tokens := utils.SplitToFloat(valueStr, "|")
 		value = utils.RandomOneOf(tokens...)
 	} else if valueType == functiontypes.RandomRange {
 		if column.Min != nil && column.Max != nil {
