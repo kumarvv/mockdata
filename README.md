@@ -1,5 +1,7 @@
 # mockdata
 
+[![Go](https://github.com/kumarvv/mockdata/actions/workflows/go.yml/badge.svg)](https://github.com/kumarvv/mockdata/actions/workflows/go.yml)
+
 A command-line mock data generator written in Go. Define your data schema in a YAML config file and generate realistic test data as JSON, CSV, or SQL INSERT statements.
 
 ## Table of Contents
