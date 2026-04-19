@@ -54,7 +54,7 @@ func TestValidate(t *testing.T) {
 	t.Run("blank target type defaults to sql", func(t *testing.T) {
 		cfg := &models.Config{
 			Target: models.ConfigTarget{ToPath: "/tmp"},
-			Tables: []*models.ConfigTable{{Name: "t", Mode: "append", RawColumns: []map[string]string{{"id": "uuid()"}}}},
+			Tables: []*models.ConfigTable{{Name: "t", RawColumns: []map[string]string{{"id": "uuid()"}}}},
 		}
 		errs := validate(cfg)
 		if len(errs) > 0 {
@@ -68,7 +68,7 @@ func TestValidate(t *testing.T) {
 	t.Run("invalid target type returns error", func(t *testing.T) {
 		cfg := &models.Config{
 			Target: models.ConfigTarget{Type: "bogus", ToPath: "/tmp"},
-			Tables: []*models.ConfigTable{{Name: "t", Mode: "append"}},
+			Tables: []*models.ConfigTable{{Name: "t"}},
 		}
 		errs := validate(cfg)
 		if !hasErrContaining(errs, "invalid target type") {
@@ -89,7 +89,7 @@ func TestValidate(t *testing.T) {
 	t.Run("table with blank name returns error", func(t *testing.T) {
 		cfg := &models.Config{
 			Target: models.ConfigTarget{Type: "json", ToPath: "/tmp"},
-			Tables: []*models.ConfigTable{{Name: "", Mode: "append"}},
+			Tables: []*models.ConfigTable{{Name: ""}},
 		}
 		errs := validate(cfg)
 		if !hasErrContaining(errs, "table name is required") {
@@ -98,7 +98,7 @@ func TestValidate(t *testing.T) {
 	})
 
 	t.Run("table with blank mode defaults to append", func(t *testing.T) {
-		table := &models.ConfigTable{Name: "users", Mode: "", RawColumns: []map[string]string{{"id": "uuid()"}}}
+		table := &models.ConfigTable{Name: "users", RawColumns: []map[string]string{{"id": "uuid()"}}}
 		cfg := &models.Config{
 			Target: models.ConfigTarget{Type: "json", ToPath: "/tmp"},
 			Tables: []*models.ConfigTable{table},
@@ -112,7 +112,7 @@ func TestValidate(t *testing.T) {
 	t.Run("table with invalid mode returns error", func(t *testing.T) {
 		cfg := &models.Config{
 			Target: models.ConfigTarget{Type: "json", ToPath: "/tmp"},
-			Tables: []*models.ConfigTable{{Name: "t", Mode: "truncate"}},
+			Tables: []*models.ConfigTable{{Name: "t"}},
 		}
 		errs := validate(cfg)
 		if !hasErrContaining(errs, "invalid table mode") {
@@ -125,7 +125,6 @@ func TestValidate(t *testing.T) {
 			Target: models.ConfigTarget{Type: "json", ToPath: "/tmp"},
 			Tables: []*models.ConfigTable{{
 				Name:       "users",
-				Mode:       "append",
 				RawColumns: []map[string]string{{"id": "nofunc"}},
 			}},
 		}
@@ -138,7 +137,7 @@ func TestValidate(t *testing.T) {
 	t.Run("multiple errors collected", func(t *testing.T) {
 		cfg := &models.Config{
 			Target: models.ConfigTarget{Type: "bogus"},
-			Tables: []*models.ConfigTable{{Name: "", Mode: "bad"}},
+			Tables: []*models.ConfigTable{{Name: ""}},
 		}
 		errs := validate(cfg)
 		if len(errs) < 2 {
