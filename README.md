@@ -59,7 +59,6 @@ target:
 
 tables:
   - name: users           # Table/file name (required)
-    mode: append          # File mode: append | merge (optional, default: append)
     row_count: 100        # Number of rows to generate (optional, default: 1)
     columns:
       - column_name: function_name(param1=value1,param2=value2)
@@ -79,7 +78,6 @@ tables:
 | Field       | Required | Description |
 |-------------|----------|-------------|
 | `name`      | Yes      | Table name; used as the output file name |
-| `mode`      | No       | `append` adds rows to existing file; `merge` replaces (default: `append`) |
 | `row_count` | No       | Number of rows to generate (default: `1`) |
 | `columns`   | Yes      | List of column definitions as `column_name: function_expr` pairs |
 
@@ -461,7 +459,6 @@ target:
 
 tables:
   - name: tags
-    mode: append
     row_count: 5
     columns:
       - uuid: uuid()
