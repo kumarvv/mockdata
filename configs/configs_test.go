@@ -109,17 +109,6 @@ func TestValidate(t *testing.T) {
 		}
 	})
 
-	t.Run("table with invalid mode returns error", func(t *testing.T) {
-		cfg := &models.Config{
-			Target: models.ConfigTarget{Type: "json", ToPath: "/tmp"},
-			Tables: []*models.ConfigTable{{Name: "t"}},
-		}
-		errs := validate(cfg)
-		if !hasErrContaining(errs, "invalid table mode") {
-			t.Errorf("expected 'invalid table mode', got %v", errMessages(errs))
-		}
-	})
-
 	t.Run("column with invalid expression returns error", func(t *testing.T) {
 		cfg := &models.Config{
 			Target: models.ConfigTarget{Type: "json", ToPath: "/tmp"},
@@ -404,7 +393,6 @@ target:
   to_path: /tmp/out
 tables:
   - name: users
-    mode: append
     row_count: 5
     columns:
       - id: uuid()
