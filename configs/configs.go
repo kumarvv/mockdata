@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 	"kumarvv.com/mockdata/constants/functiontypes"
-	"kumarvv.com/mockdata/constants/tablemodes"
 	"kumarvv.com/mockdata/constants/targettypes"
 	"kumarvv.com/mockdata/utils"
 
@@ -74,12 +73,6 @@ func validate(config *models.Config) []error {
 	for _, table := range config.Tables {
 		if utils.IsBlank(table.Name) {
 			errs = append(errs, errors.Errorf("table name is required for table %s", table.Name))
-		}
-		if utils.IsBlank(table.Mode) {
-			table.Mode = tablemodes.Append
-		}
-		if !utils.Includes(tablemodes.List(), table.Mode) {
-			errs = append(errs, errors.Errorf("invalid table mode %s for table %s", table.Mode, table.Name))
 		}
 
 		table.Columns = make([]*models.Column, 0)
